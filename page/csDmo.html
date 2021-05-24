@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>www.jb51.net jQuery动态获取事件</title>
+</head>
+<body>
+<div id="test"></div>
+</body>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+  var html="";//声明变量用于存放html
+  for (i=0;i<=10;i++){
+    html=html+"<button>按钮"+i+"</button></br>";
+  }
+  $('#test').html(html);
+  $('#test').on('click','button',function (e){
+    console.log($(this));
+  });
+</script>
+</html>

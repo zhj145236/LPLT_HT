@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link href="../../css/detailedStore.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../../js/template.js"></script>
+<script type="text/javascript" src="../../js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<title>门店详情</title>
+</head>
+<body>
+	<!-- 抬头标题 -->
+	<div class="add-stores-count">
+		<!-- 顶部位置提示 -->
+		<div class="bj-color-count">
+			<form action="#" method="post" enctype="multipart/form-data">
+				<div class="count-top">
+					<p></p>
+				</div>
+				<!-- 门店名称 -->
+				<div class="stores-add unified-style">
+					<p>门店名称：</p>
+					<input type="text" name="storesname" class="storesname samestyle" placeholder="请输入添加门店的名称" value="" />
+				</div>				
+				<!-- 门店创建时间 -->
+				<div class="stores-add unified-style">
+					<p>门店创建时间：</p>
+					<input type="text" name="" class="createTime samestyle" placeholder="请输入添加门店的名称" disabled="disabled" value="" />
+				</div>
+				<!-- 门店展示图上传 -->
+				<div class="stores-show-img unified-style">
+					<p>门店展示图：</p>
+					<div class="stores-show-img-upload-div">
+						<div class="stores-show-img-upload">展示图上传</div>
+						<input type="file" name="storesshow" id="uploadShow" />
+					</div>
+					<ul id="imgShow"></ul>
+				</div>
+				<!-- 门店产品图上传 -->
+				<div class="stores-product-img unified-style">
+					<p>门店产品图：</p>
+					<div class="stores-product-img-upload-div">
+						<div class="stores-product-img-upload">产品图上传</div>
+						<input type="file" name="storesproduct" id="uploadProduct" />
+					</div>
+					<ul id="imageProduct"></ul>
+				</div>
+				<!-- 门店地址 -->
+				<div class="stores-add unified-style">
+					<p>门店地址：</p>
+					<input type="text" name="storesadd" class="storesadd samestyle" placeholder="请输入添加门店的地址" value="" />
+				</div>
+				<!-- 门店电话 -->
+				<div class="stores-tel unified-style">
+					<p>门店电话：</p>
+					<input type="text" name="storestel" class="storestel samestyle" placeholder="请输入添加门店的电话" value="" />
+				</div>
+				<!--门店设施 -->
+				<div class="stores-facilities unified-style">
+					<p>门店设施：</p>
+					<input type="text" name="storesfacilities" class="storesfacilities samestyle" placeholder="请输入门店设施" value="" />
+				</div>
+				<!-- 门店简介 -->
+				<div class="stores-introduce unified-style">
+					<p>门店简介：</p>
+					<textarea type="text" name="storesintroduce" class="storesintroduce samestyle" placeholder="请填写门店简介"></textarea>
+				</div>
+				<!-- 提交或取消 -->
+				<div class="determine-cancel">
+					<input class="determine-inp" type="text" value="提交" />
+					<input class="cancel-inp" type="button" value="取消" />
+				</div>
+			</form>
+		</div>
+	</div>
+</body>
+<script>
+	// 设置门店信息
+	let storeData = "",
+	storeImg = "",
+	storeUrl = window.location.href,
+	needUrl = storeUrl.split('?')[1],
+	needId = needUrl.split('=')[1],
+	u = getUrl();
+	storeData = JSON.parse(localStorage.getItem("userData")); // 门店名称
+	if(storeData == null || storeData == undefined){
+		$(window).attr('location','/page/login.html');
+	}else{
+		$('.stores-show-img-upload-div').hide();
+		$('.stores-product-img-upload-div').hide();
+		// 获取门店详情信息
+		$.post(u + "store/storeInfo/get", {
+			id:needId,
+		}, function(res) {
+			let datas = res.data,
+			storeProductImg = datas.bannerPic.split('|'),
+			imgShowNodeLen = $('#imgShow .newLi').length,
+			imageProductLen = $('#imageProduct .newLi').length,
+			imgArr = [];
+			$('.count-top p').append(datas.name + '详情'); // 详情信息头部
+			$('.storesname').attr('value',datas.name); // 门店名称
+			$('.createTime').attr('value',datas.createDate); // 门店创建时间
+			$('#imgShow').append('<li class="newLi"><img src="'+ u + datas.logoPic + '" /><div class="uploadFather"><p id="newImgShow" class="clearImageProduct">删除</p></div></li>'); // 门店图片
+			$('.storesadd').attr('value',datas.address); // 门点地址
+			$('.storestel').attr('value',datas.tel); // 门点电话
+			$('.storesfacilities').attr('value',datas.equipList); // 门点设施
+			$('.storesintroduce').append(datas.describe); // 门店简介
+			// 四张产品图展示
+			// console.log(datas);
+			for(let i=0;i<storeProductImg.length;i++){
+				// console.log(storeProductImg[i]);
+				$('#imageProduct').append('<li class="newLi"><img src="'+ u + storeProductImg[i] + '" /><div class="uploadFather"><p id="newImageProduct'+ i +'" class="clearImageProduct">删除</p></div></li>');
+				
+			}
+			
+			
+			// 一张图片的处理
+			$('#imgShow').on('click','#newImgShow',function(){
+				$(this).parentsUntil('#imgShow').remove();
+				$(".stores-show-img-upload-div").show();
+			});
+			
+			// 清除两张以上的图片
+			for(let j=0;j<storeProductImg.length;j++){
+				$('#imageProduct').on('click','#newImageProduct'+j,function(){
+					$(this).parents('.uploadFather').parents('.newLi').remove();
+					if($('#imageProduct .newLi').length == 0){
+						$(".stores-product-img-upload-div").show();
+					}
+				});
+			}
+			
+			uploadImg('uploadShow','imgShow','1'); // 门店展示图上传
+			uploadImg('uploadProduct','imageProduct','4'); // 门店产品图
+			
+		});
+		
+		// 拼接地址函数
+		function jointUrl(targetId,imgId,getStoreName,getStoreAdd,getStoreTel,getStoreFacilities,getStoreIntroduce){
+			// targetId：目标节点
+			// 上传图片的id
+			// getStoreName：门店名称
+			// getStoreAdd：门店地址
+			// getStoreTel：门店电话
+			// getStoreFacilities：门店设施
+			// getStoreIntroduce：门店简介
+			let imageProductLen = document.getElementById(targetId).childNodes, // 门店产品图父级li节点
+			imgShowLen = document.getElementById(imgId).childNodes, // 门店展示图父级li节点
+			subProductImgArr = [], // 创建空数组，存放门店产品图img的src
+			subShowImgArr = [], // 创建空数组，存放门店展示图img的src
+			JoinProductSrc = "", // 拼接有效的门店产品图提交路径数据
+			JoinShowSrc = "", // 拼接有效的门店展示图提交路径数据
+			storesshowVal = "", // 门店展示图路径
+			storesproductVal = ""; // 门店产品图路径
+			
+			// 门店名称验证
+			if(getStoreName == "" || getStoreName == undefined || getStoreName == null){
+				alert('请输入门店名称');
+				return;
+			}
+			// 门店地址验证
+			if(getStoreAdd == "" || getStoreAdd == undefined || getStoreAdd == null){
+				alert('请输入门店地址');
+				return;
+			}
+			// 门店电话验证
+			if(getStoreTel == "" || getStoreTel == undefined || getStoreTel == null){
+				alert('请输入门店地址');
+				return;
+			}
+			// 门店设施验证
+			if(getStoreFacilities == "" || getStoreFacilities == undefined || getStoreFacilities == null){
+				alert('请输入门店设施');
+				return;
+			}
+			if(getStoreIntroduce == "" || getStoreIntroduce == undefined || getStoreIntroduce == null){
+				// 门店简介验证
+				alert('请输入门店简介');
+				return;
+			}
+			
+			// 获取门店产品图上传接口的路径
+			for(let s=0;s<imageProductLen.length;s++){
+				let subProductImgSrc = "";
+				subProductImgSrc = imageProductLen[s].firstElementChild.src;
+				subProductImgArr.push(subProductImgSrc);
+			}
+			if(imageProductLen.length == 0){
+				alert('门店产品图不能为空');
+				return;
+			}else{
+				for(let a in subProductImgArr){					
+					JoinProductSrc += '/api' + subProductImgArr[a].split('api')[1] + '|';					
+				}
+			}
+			
+			// 获取门店展示图上传接口的路径
+			for(let s=0;s<imgShowLen.length;s++){
+				let subShowImgSrc = "";
+				subShowImgSrc = imgShowLen[s].firstElementChild.src;
+				subShowImgArr.push(subShowImgSrc);
+			}
+			if(imgShowLen.length == 0){
+				alert('门店展示图不能为空');
+				return;
+			}else{
+				for(let a in subShowImgArr){					
+					JoinShowSrc += '/api' + subShowImgArr[a].split('api')[1] + '|';					
+				}
+			}
+			$.ajax({
+				// 请求头信息
+				headers:{
+					"Accept": "application/json",
+					"token":JSON.parse(localStorage.getItem("userData")).map.token
+				},
+				// 请求方式
+				type:"POST",
+				// 请求属于同步还是异步
+				async:false,
+				// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+				dataType:'json',
+				url:u+"store/storeInfo/save",
+				contentType : "application/json",
+				data:JSON.stringify({
+					"id":needId,
+					"name":getStoreName,
+					"address":getStoreAdd,
+					"equipList":getStoreFacilities,
+					"describe":getStoreIntroduce,
+					"tel":getStoreTel,
+					"logoPic":JoinShowSrc.substring(0,JoinShowSrc.length-1),
+					"bannerPic":JoinProductSrc.substring(0,JoinProductSrc.length-1)
+				}),
+				success:function (res) {
+					if(res.code == 200){
+						$(window).attr('location','/page/storesManagement/storesManagement.html');
+					}else{
+						// console.log(res);
+						alert('修改失败');
+					}
+				},
+				error:function(err) {
+					console.log(err.status,'失败返回');
+				},				
+			});
+		}
+		
+		// 信息修改提交
+		$('.determine-inp').click(function(){
+			let storesnameVal = $("input[name=storesname]").val(), // 门店名称
+			storesaddVal = $("input[name='storesadd']").val(), // 门店地址
+			storestelVal = $("input[name='storestel']").val(), // 门店电话
+			storesfacilitiesVal = $("input[name='storesfacilities']").val(); // 门店设施
+			storesintroduceVal = $("textarea[name='storesintroduce']").val(), // 门店简介			
+			// 提交表单的时候如果是多张图片就拼接地址
+			jointUrl('imageProduct','imgShow',storesnameVal,storesaddVal,storestelVal,storesfacilitiesVal,storesintroduceVal);
+		});		
+		// 点击取消
+		$('.cancel-inp').click(function(){
+			$(window).attr('location','/page/storesManagement/storesManagement.html');
+		});
+	}
+</script>
+</html>

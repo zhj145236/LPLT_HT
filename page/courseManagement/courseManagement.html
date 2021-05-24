@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>周计划模板</title>
+<script type="text/javascript" src="../../js/jquery-3.4.1.min.js"></script>
+<link href="../../css/public.css" rel="stylesheet" type="text/css">
+<link href="../../css/template.css" rel="stylesheet" type="text/css">
+<link href="../../css/courseManagement.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../../js/config.js"></script>
+</head>
+<body>
+	<!-- 门店管理 -->
+	<header>
+		<!-- logo展示 -->
+		<div class="out-logo">
+			<div class="out-logo-img">
+				<div class="logo-img">
+					<img src="../../image/logo.jpg">
+				</div>
+				<p id="out-logo-name"></p>
+			</div>
+			<ul class="header-ul">
+				<li>退出</li>
+			</ul>
+		</div>
+	</header>
+	<!-- 左边菜单栏 -->
+	<ul class="left-menu-ul">
+		<li class="left-menu">
+			<nav>
+				<a href="../storesManagement/storesManagement.html" onclick="selectMenu(this)">门店管理</a>
+				<a class="curCls" href="../courseManagement/courseManagement.html" onclick="selectMenu(this)">周计划模板</a>
+				<a href="../coachManagement/coachManagement.html" onclick="selectMenu(this)">教练管理</a>
+				<a href="../groupClassManagement/groupClassManagement.html" onclick="selectMenu(this)">团课管理</a>
+				<a href="../personalTrainingManagement/personalTrainingManagement.html" onclick="selectMenu(this)">私课管理</a>
+				<a href="../activityCenter/activityCenter.html" onclick="selectMenu(this)">活动中心</a>
+				<a href="../memberManagement/memberManagement.html" onclick="selectMenu(this)">手机注册</a>
+				<a href="../storesMember/storesMember.html" onclick="selectMenu(this)">会员记录</a>
+			</nav>		
+		</li>
+		<li class="right-content">
+			<div class="center-content">
+				<!-- 新增按钮 -->
+				<div class="add-stores">
+					<button class="add-stores-btn"><a href="#">周计划模板</a></button>
+					<div class="chosestores-out">
+						<select name="chosestores" class="chosestores"></select>
+					</div>
+					<button class="add-stores-btn determine">确认门店</button>
+				</div>
+				<!-- 课程模板内容 -->
+				<ul class="course-management-ul">
+					<li class="course-management-ul-li"></li>
+				</ul>
+			</div>
+		</li>
+	</ul>
+</body>
+<script type="text/javascript">
+	function selectMenu(obj) {
+	    var eles = document.getElementsByTagName("a");
+	    for (let i = 0; i < eles.length; i++) {
+	        let e = eles[i];
+	        let clsAttr = e.getAttribute["group"];
+	        if (clsAttr = "") {
+	            e.setAttribute("class", "");
+	        }
+	        obj.setAttribute("class","curCls");
+	    }
+	}
+</script>
+	
+<script type="text/javascript">	
+	// 是总部还是门店名称
+	$(document).ready(function() {
+		// 头部信息数据处理
+		// console.log(JSON.parse(localStorage.getItem("userData")),"用户数据");
+		let storeData = "",storeImg = ""; // 声明存放门店名称的变量
+		storeData = JSON.parse(localStorage.getItem("userData")),
+		u = getUrl(); // 门店名称
+		console.log(storeData);
+		if(storeData == null || storeData == undefined){
+			// $(window).attr('location','/page/login.html');
+		}else{
+			let storesDows = storeData.map.mystores,
+			storeIdData = storeData.map.user.store_id,
+			storeName = "",
+			storesList,
+			chosestoresData;
+			// 设置门店信息
+			if (storeIdData == -1) {
+				$('#out-logo-name').html('旅·普拉提总部');
+				storesList+='<option value="" selected="selected">请选择门店(总部)</option>';
+			} else{
+				for(let j=0;j<storesDows.length;j++){
+					$('#out-logo-name').html('旅·普拉提-' + storesDows[j].name);
+					storeName = "旅·普拉提-" + storesDows[j].name;
+				}
+			}
+			// 门店数据渲染
+			for(let i=0;i<storesDows.length;i++){
+				storesList+='<option value="' + storesDows[i].id + '">' + storesDows[i].name + '</option>';
+				$('.chosestores').html(storesList);
+			}
+			
+			// 通过选择门店加载对应门店数据
+			function getClassTemplate(getId){
+				setTimeout(function() {
+					// 表单提交的方式 课程模板
+					// console.log(JSON.parse(localStorage.getItem("userData")).map.mystores,'数据');		
+					let weekData="",classData = "";
+					
+					// 课程模板数据
+					$.post(u+"course/weekPlan/getWeekTemplate", {
+						storeId:getId
+					}, function(data) {
+						// console.log(data);
+						let datas = data.data;
+						let weekArr = [];
+						console.log(datas,'课程数据');
+						for(let tmp in datas){
+							let weekObj = {};
+							switch(tmp){
+								case "1":weekObj.week='星期一';weekObj.weekNum='1';weekObj.className=datas[1];weekArr.push(weekObj);break;
+								case "2":weekObj.week='星期二';weekObj.weekNum='2';weekObj.className=datas[2];weekArr.push(weekObj);break;
+								case "3":weekObj.week='星期三';weekObj.weekNum='3';weekObj.className=datas[3];weekArr.push(weekObj);break;
+								case "4":weekObj.week='星期四';weekObj.weekNum='4';weekObj.className=datas[4];weekArr.push(weekObj);break;
+								case "5":weekObj.week='星期五';weekObj.weekNum='5';weekObj.className=datas[5];weekArr.push(weekObj);break;
+								case "6":weekObj.week='星期六';weekObj.weekNum='6';weekObj.className=datas[6];weekArr.push(weekObj);break;
+								case "7":weekObj.week='星期日';weekObj.weekNum='7';weekObj.className=datas[7];weekArr.push(weekObj);break;
+								default:
+							};
+						};
+						for(let s=0;s<weekArr.length;s++){
+							let weekArrclassName = weekArr[s].className;
+							// 对应星期时间
+							weekData+='<div class="course-management-title">';
+							weekData+='<div class="course-management-title-out">';
+							weekData+='<p weekNumData = "' + weekArr[s].weekNum + '">' + weekArr[s].week + '</p>';
+							weekData+='<a class="addClass">新增课程</a>';
+							// weekData+='<a class="addClass" href="addCourse.html">新增课程</a>';
+							weekData+='</div>';
+							weekData+='</div>';
+							if(weekArrclassName.length != 0){
+								for(let f=0;f<weekArrclassName.length;f++){
+									let timeData = weekArrclassName[f].classInterval,indexTimeData = timeData.split('-'),weekId = weekArrclassName[f].id,weekStoreId = weekArrclassName[f].storeId;
+									weekData+='<ul class="course-management-count">';
+									weekData+='<li class="course-management-count-list">';
+									weekData+='<div class="course-management-count-li-left">';
+									weekData+='<p>课程名称：' + weekArrclassName[f].course + '</p>';
+									weekData+='<p>课程开始时间：' + indexTimeData[0] + '</p>';
+									weekData+='<p>课程结束时间：' + indexTimeData[1] + '</p>';
+									weekData+='</div>';
+									weekData+='<div class="course-management-count-li-right">';
+									weekData+='<button class="clear-btn" id="' + weekId + '" weekStoreId="' + weekStoreId + '">删除</button>';
+									weekData+='<a class="details-btn" href="courseDetailed.html?id=' + weekId + '">详情</a>';
+									weekData+='</div>';
+									weekData+='</li>';
+									weekData+='</ul>';
+								}
+							}else{
+								weekData+='<div class="info-prompt">暂无添加任何课程，请点击添加课程</div>';
+							}
+							$('.course-management-ul-li').html(weekData);
+						}
+					});	
+				},300);
+			}
+			
+			$('.chosestores').on("change", function(){
+				let changeGetData = this.value;
+				chosestoresData = changeGetData;
+			});
+			if(chosestoresData == undefined || chosestoresData == ""){
+				getClassTemplate(storeIdData);
+			}
+			$(".determine").on("click",function(){
+				if(chosestoresData == "" || chosestoresData == undefined){
+					getClassTemplate(storeIdData);
+				}else{
+					getClassTemplate(chosestoresData);
+				}
+			});
+			
+			// 删除课程数据
+			$('.course-management-ul-li').on("click",".clear-btn",function(){
+				let classId = $(this).attr('id'),weekStoreId = $(this).attr('weekStoreId');
+				$.post(u+"course/weekPlan/delete", {
+					id:classId,
+				}, function(clearData) {
+					getClassTemplate(weekStoreId);
+				});
+			});
+			
+			// 课程新增
+			$(".course-management-ul-li").on("click",".addClass",function(){
+				let weekIndex = $(this).siblings().attr('weekNumData');
+				if(chosestoresData == "" || chosestoresData == undefined){
+					$(window).attr('location','/page/courseManagement/addCourse.html?storeId=' + storeIdData + '&weekIndex=' + weekIndex);
+				}else{
+					$(window).attr('location','/page/courseManagement/addCourse.html?storeId=' + chosestoresData + '&weekIndex=' + weekIndex);
+				}
+			});
+		}
+	});
+</script>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link href="../../css/activityDetail.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../../js/template.js"></script>
+<title>活动详情</title>
+</head>
+<body>
+	<!-- 抬头标题 -->
+	<div class="add-stores-count">
+		<!-- 顶部位置提示 -->
+		<div class="bj-color-count">
+			<form action="#" method="post" enctype="multipart/form-data">
+				<div class="count-top">
+					<p>活动详情</p>
+				</div>
+				<!-- 活动图片 -->
+				<div class="stores-show-img unified-style">
+					<p>活动图片：</p>
+					<div class="stores-show-img-upload-div">
+						<div class="stores-show-img-upload">活动图片上传</div>
+						<input type="file" name="prevImgSrc" id="uploadShow" />
+					</div>
+					<ul id="imgShow"></ul>
+				</div>
+				<!-- 门店地址 -->
+				<div class="stores-add unified-style">
+					<p>活动主标题：</p>
+					<input type="text" name="title" class="storesadd samestyle" placeholder="请输入添加的活动主标题" value="" />
+				</div>
+				<!-- 活动副标题 -->
+				<div class="stores-tel unified-style">
+					<p>活动副标题：</p>
+					<input type="text" name="subTitle" class="storestel samestyle" placeholder="请输入添加的活动副标题" value="" />
+				</div>
+				<!--活动开始时间 -->
+				<div class="stores-facilities unified-style">
+					<p>活动开始时间：</p>
+					<input type="text" name="applyBeginTime" class="storesfacilities samestyle" placeholder="活动开始时间" value="" />
+				</div>
+				<!--活动结束时间 -->
+				<div class="stores-facilities unified-style">
+					<p>活动结束时间：</p>
+					<input type="text" name="applyEndTime" class="storesfacilities samestyle" placeholder="活动结束时间" value="" />
+				</div>
+				<!--可报名人数 -->
+				<div class="stores-facilities unified-style">
+					<p>可报名人数：</p>
+					<input type="text" name="applyMaxNumber" class="storesfacilities samestyle" placeholder="可报名人数" value="" />
+				</div>
+				<!-- 选择活动门店 -->
+				<div class="stores-facilities unified-style">
+					<p>活动门店：</p>
+					<select name="storeId" class="samestyle">
+						<option value="">请选择已添加的门店</option>
+						<option value="XXX门店一">XXX门店一</option>
+						<option value="XXX门店二">XXX门店二</option>
+						<option value="XXX门店三">XXX门店三</option>
+						<option value="XXX门店四">XXX门店四</option>
+						<option value="XXX门店五">XXX门店五</option>
+					</select>
+				</div>
+				<!-- 活动内容 -->
+				<div class="stores-introduce unified-style">
+					<p>活动内容：</p>
+					<textarea type="text" name="content" class="storesintroduce samestyle" placeholder="请填写活动内容"></textarea>
+				</div>
+				<!-- 提交或取消 -->
+				<div class="determine-cancel">
+					<input class="determine-inp" type="submit" value="提交" />
+					<input class="cancel-inp" type="button" value="取消" />
+				</div>
+			</form>
+		</div>
+	</div>
+</body>
+<script>
+	uploadImg('uploadShow','imgShow');
+</script>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>团课管理</title>
+<link href="../../css/public.css" rel="stylesheet" type="text/css">
+<link href="../../css/template.css" rel="stylesheet" type="text/css">
+<link href="../../css/groupClassManagement.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="../../css/xcConfirm.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/xcssConfirm.css"/>
+<script type="text/javascript" src="../../js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script src="../../js/xcConfirm.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../js/xcssConfirm.js" type="text/javascript" charset="utf-8"></script>
+
+</head>
+<body>
+	<!-- 门店管理 -->
+	<header>
+		<!-- logo展示 -->
+		<div class="out-logo">
+			<div class="out-logo-img">
+				<div class="logo-img">
+					<img src="../../image/logo.jpg">
+				</div>
+				<p id="out-logo-name"></p>
+			</div>
+			<ul class="header-ul">
+				<li>退出</li>
+			</ul>
+		</div>
+	</header>
+	<!-- 左边菜单栏 -->
+	<ul class="left-menu-ul">
+		<li class="left-menu">
+			<nav>
+				<a href="../storesManagement/storesManagement.html" onclick="selectMenu(this)">门店管理</a>
+				<a href="../courseManagement/courseManagement.html" onclick="selectMenu(this)">周计划模板</a>
+				<a href="../coachManagement/coachManagement.html" onclick="selectMenu(this)">教练管理</a>
+				<a class="curCls" href="../groupClassManagement/groupClassManagement.html" onclick="selectMenu(this)">团课管理</a>
+				<a href="../personalTrainingManagement/personalTrainingManagement.html" onclick="selectMenu(this)">私课管理</a>
+				<a href="../activityCenter/activityCenter.html" onclick="selectMenu(this)">活动中心</a>
+				<a href="../memberManagement/memberManagement.html" onclick="selectMenu(this)">手机注册</a>
+				<a href="../storesMember/storesMember.html" onclick="selectMenu(this)">会员记录</a>
+			</nav>		
+		</li>
+		<li class="right-content">
+			<div class="center-content">
+				<!-- 新增按钮 -->
+				<div class="add-stores">
+					<button class="add-stores-btn new-coach"></button>
+					<div class="chosestores-out">
+						<select name="chosestores" class="chosestores"></select>
+					</div>
+					<button class="add-stores-btn determine">确认门店</button>
+				</div>
+				<!-- 门店列表 -->
+				<ul class="stores-list">
+					<div class="hiden-data">总部暂无团课信息，请添选择对应分店点击确认查看数据。</div>
+					<div class="show-data"></div>
+				</ul>
+			</div>
+		</li>
+	</ul>
+</body>
+<script type="text/javascript">
+	function selectMenu(obj) {
+	    var eles = document.getElementsByTagName("a");
+	    for (let i = 0; i < eles.length; i++) {
+	        let e = eles[i];
+	        let clsAttr = e.getAttribute["group"];
+	        if (clsAttr = "") {
+	            e.setAttribute("class", "");
+	        }
+	        obj.setAttribute("class","curCls");
+	    }
+	}
+	
+	
+	$(document).ready(function() {
+		// 设置门店信息
+		let storeData = "",
+		storeImg = "",
+		u = getUrl();
+		
+		storeData = JSON.parse(localStorage.getItem("userData")); // 门店名称
+		if(storeData == null || storeData == undefined){
+			$(window).attr('location','/page/login.html');
+		}else{
+			let storesDows = storeData.map.mystores,
+			storeIdData = storeData.map.user.store_id, // 门店id
+			storeName = "",
+			storesList="",
+			chosestoresData;
+			// 设置门店信息
+			if (storeIdData == -1) {
+				$('#out-logo-name').html('旅·普拉提总部');
+				$('.new-coach').html('查看门店数据');
+				storesList+='<option value="" selected="selected">请选择门店</option>';
+			} else{
+				$('.new-coach').html('新增团课');
+				$(".determine").css("display","none");
+				for(let j=0;j<storesDows.length;j++){
+					$('#out-logo-name').html('旅·普拉提-' + storesDows[j].name);
+					storeName = "旅·普拉提-" + storesDows[j].name;
+				}
+			}
+			
+			// 门店数据渲染
+			for(let i=0;i<storesDows.length;i++){
+				storesList+='<option value="' + storesDows[i].id + '">' + storesDows[i].name + '</option>';
+				$('.chosestores').html(storesList);
+			}
+			
+			// 通过选择门店加载对应门店数据
+			function getClassTemplate(getId,showTarget,hideTarget,joinData){
+				console.log(getId,'门店id');
+				// json格式提交数据 获取团课信息列表数据
+				$.ajax({
+					// 请求头信息
+					headers:{
+						"Accept": "application/json",
+						"token":JSON.parse(localStorage.getItem("userData")).map.token
+					},
+					// 请求方式
+					type:"POST",
+					// 请求属于同步还是异步
+					async:false,
+					// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+					dataType:'json',
+					url:u+"course/teamCourse/list",
+					contentType : "application/json",
+					data:JSON.stringify({"storeId":getId}),
+					success:function (data) {
+						let effectiveData = data.page.rows;
+						console.log(data,'门店对应数据');
+						if(effectiveData == null){
+							// alert('没有数据');
+							$(hideTarget).css("display","block");
+							$(showTarget).css("display","none");
+						}else{
+							// alert('有数据');
+							$(showTarget).css("display","block");
+							$(hideTarget).css("display","none");
+							for(let s in effectiveData){
+								joinData+='<li class="stores-list-li">';
+								joinData+='<div class="stores-list-li-left">';
+								joinData+='<div class="stores-img"><img src="' + u + effectiveData[s].descImage + '" /></div>'; // 团课图片
+								joinData+='<p class="change-style">团课开始时间：' + effectiveData[s].starttime + '</p>'; // 团课开始时间
+								joinData+='<p class="change-style">团课结束时间：' + effectiveData[s].endtime + '</p>'; // 团课结束时间
+								joinData+='<p class="change-style">团课名称：' + effectiveData[s].courseName + '</p>'; // 团课结束时间
+								joinData+='<p class="change-style">教练名称：' + effectiveData[s].coachName + '</p>'; // 团课教练名称
+								joinData+='</div>';
+								joinData+='<div class="stores-list-li-right">'; 
+								joinData+='<button class="stores-clear" coachId="' + effectiveData[s].id + '">删除</button>';
+								joinData+='<button class="stores-detailed" coachId="' + effectiveData[s].id + '">详情</button>';
+								joinData+='<button class="make-stores-detailed" coachId="' + effectiveData[s].id + '">查看预约</button>';
+								joinData+='</div>';
+								joinData+='</li>';							
+								$(showTarget).html(joinData);
+							}
+						}
+					},
+					error:function(err) {
+						console.log(err.status,'失败返回');
+					},
+				});
+			}
+			
+			// select改变事件
+			$('.chosestores').on("change", function(){
+				let changeGetData = this.value;
+				chosestoresData = changeGetData;
+			});
+			if(chosestoresData == undefined || chosestoresData == ""){
+				let getData = "";
+				getClassTemplate(storeIdData,'.show-data','.hiden-data',getData);
+			}
+			// 确认按钮点击事件
+			$(".determine").on("click",function(){
+				let getData = ""; // 声明存放门店名称的变量
+				getClassTemplate(chosestoresData,'.show-data','.hiden-data',getData);
+			});
+			
+			// 点击新增按钮实现新增功能
+			if(storeIdData != -1){
+				$('.new-coach').click(function(){
+					$(window).attr('location','/page/groupClassManagement/addGroup.html?storeId=' + storeIdData);
+				});
+			}
+			
+			// 点击删除，执行删除功能
+			$('.show-data').on('click','.stores-clear',function(){
+				let coachId = $(this).attr("coachId");
+				console.log(coachId);
+				$.ajax({
+					// 请求头信息
+					headers:{
+						"Accept": "application/json",
+						"token":JSON.parse(localStorage.getItem("userData")).map.token
+					},
+					// 请求方式
+					type:"POST",
+					// 请求属于同步还是异步
+					async:false,
+					// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+					dataType:'json',
+					url:u+"course/teamCourse/delete",
+					contentType : "application/x-www-form-urlencoded",
+					data:{
+						"id":coachId
+					},
+					success:function (data) {
+						if(data.code==200 && data.msg=="删除成功！"){
+							window.location.reload();
+						}
+					},
+					error:function(err) {
+						console.log(err.status,'失败返回');
+					},
+				});
+			});
+			// 私课查看预约情况
+			$('.show-data').on('click','.make-stores-detailed',function(){
+				let weekId = $(this).attr('coachid');
+				$.post(u+'course/teamCourse/getCourseSubDetail',{courseId:weekId},function(res){
+					if(res.success){
+						let numData = "",datas = res.data;
+						console.log(datas.length);
+						if(datas.length != 0){
+							for(let i in datas){
+								numData+='<div class="sign-user-list">';
+								numData+='<text>姓名：' + datas[i].userName + '</text>';
+								if (datas[i].sex == "0") {
+									numData+='<text>姓别：女</text>';
+								} else if(datas[i].sex == "1"){
+									numData+='<text>姓别：男</text>';
+								}
+								numData+='<text>联系方式：' + datas[i].tel + '</text>';
+								numData+='<text>提交时间：' + datas[i].applyDate + '</text>';
+								numData+='</div>';
+							}
+							let txt = numData;
+							window.wxcss.xcConfirm(txt);
+						}else{
+							let txt = '暂无预约';
+							window.wxcss.xcConfirm(txt);
+						}
+					}
+					console.log(res,'返回的预约数据');
+				});
+			})
+			
+			// 点击详情进入详情界面
+			$('.show-data').on('click','.stores-detailed',function(){
+				let coachId = $(this).attr("coachId");
+				$(window).attr('location','/page/groupClassManagement/groupDetailed.html?id=' + coachId + '&storeId=' + storeIdData);
+			});
+		}		
+	});
+</script>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>会员管理</title>
+<link href="../../css/public.css" rel="stylesheet" type="text/css">
+<link href="../../css/template.css" rel="stylesheet" type="text/css">
+<link href="../../css/memberManagement.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../../js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+</head>
+<body>
+	<!-- 门店管理 -->
+	<header>
+		<!-- logo展示 -->
+		<div class="out-logo">
+			<div class="out-logo-img">
+				<div class="logo-img">
+					<img src="../../image/logo.jpg">
+				</div>
+				<p id="out-logo-name"></p>
+			</div>
+			<ul class="header-ul">
+				<li>退出</li>
+			</ul>
+		</div>
+	</header>
+	<!-- 左边菜单栏 -->
+	<ul class="left-menu-ul">
+		<li class="left-menu">
+			<nav>
+				<a href="../storesManagement/storesManagement.html" onclick="selectMenu(this)">门店管理</a>
+				<a href="../courseManagement/courseManagement.html" onclick="selectMenu(this)">周计划模板</a>
+				<a href="../coachManagement/coachManagement.html" onclick="selectMenu(this)">教练管理</a>
+				<a href="../groupClassManagement/groupClassManagement.html" onclick="selectMenu(this)">团课管理</a>
+				<a href="../personalTrainingManagement/personalTrainingManagement.html" onclick="selectMenu(this)">私课管理</a>
+				<a href="../activityCenter/activityCenter.html" onclick="selectMenu(this)">活动中心</a>
+				<a class="curCls" href="../memberManagement/memberManagement.html" onclick="selectMenu(this)">手机注册</a>
+				<a href="../storesMember/storesMember.html" onclick="selectMenu(this)">会员记录</a>
+			</nav>		
+		</li>
+		<li class="right-content">
+			<div class="center-content">
+				<!-- 新增按钮 -->
+				<div class="add-stores">
+					<button class="add-stores-btn"><a href="#">手机注册</a></button>
+				</div>
+				<!-- 会员管理 -->
+				<ul class="stores-list">
+					<div class="show-data"></div>
+				</ul>
+			</div>
+		</li>
+	</ul>
+</body>
+<script type="text/javascript">
+	function selectMenu(obj) {
+	    var eles = document.getElementsByTagName("a");
+	    for (let i = 0; i < eles.length; i++) {
+	        let e = eles[i];
+	        let clsAttr = e.getAttribute["group"];
+	        if (clsAttr = "") {
+	            e.setAttribute("class", "");
+	        }
+	        obj.setAttribute("class","curCls");
+	    }
+	}
+	let storeData = "",u = getUrl(); // 声明存放门店名称的变量
+	storeData = JSON.parse(localStorage.getItem("userData")); // 门店名称
+	if(storeData == null || storeData == undefined){
+		$(window).attr('location','/page/login.html');
+	}else{
+		$(document).ready(function() {
+			// 头部信息数据处理
+			// console.log(JSON.parse(localStorage.getItem("userData")),"用户数据");
+			// 设置门店信息
+			let storeData = "",storeImg = "",token = ""; // 声明存放门店名称的变量
+			storeData = JSON.parse(localStorage.getItem("userData")); // 门店名称
+			token = storeData.map.token;
+			if (storeData.map.mystores.length == 1) {
+				$('#out-logo-name').html('旅·普拉提总部');
+			} else{
+				// console.log('有多家门店');
+			}
+			
+			// json格式提交数据 获取团课信息列表数据 
+			function getMemberInfo(url,memberToken,createTarget="",receiveTarget){
+				/**
+				 * url 调取的接口
+				 * memberToken 会员唯一识别码
+				 * createTarget 用于拼接数据的容器
+				 * receiveTarget 将拼接的数据载入的父级节点
+				**/
+				$.ajax({
+					// 请求头信息
+					headers:{
+						"Accept": "application/json",
+						"token":memberToken
+					},
+					// 请求方式
+				    type:"POST",
+					// 请求属于同步还是异步
+				    async:false,
+					// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+				    dataType:'json',
+				    url:u+url,
+					contentType : "application/json",
+					data:JSON.stringify({}),
+				    success:function (data) {
+						let membersData = data.page.rows;
+						console.log(membersData,'111');
+						if(membersData != ""){
+							for(let i in membersData){
+								createTarget+='<li class="stores-list-li">';
+								createTarget+='<div class="stores-list-li-left">';
+								createTarget+='<div class="stores-img"><img src="' + u + membersData[i].headpic + '" /></div>';
+								createTarget+='<p class="stores-name change-style">会员昵称:'+ membersData[i].nickName +'</p>';
+								createTarget+='<p class="stores-time change-style">会员地址:'+ membersData[i].address +'</p>';
+								if(membersData[i].rank == null){
+									createTarget+='<p class="stores-time change-style">会员状态:暂无</p>';
+								}else{
+									createTarget+='<p class="stores-time change-style">会员状态:'+ membersData[i].rank +'</p>';
+								}
+								if(membersData[i].cardType == null){
+									createTarget+='<p class="stores-time change-style">备注:尚未备注</p></div>';
+								}else{
+									createTarget+='<p class="stores-time change-style">备注:'+ membersData[i].cardType +'</p></div>';
+								}
+								createTarget+='<div class="stores-list-li-right">';
+								createTarget+='<button class="stores-clear" data-id="'+ membersData[i].id +'">删除</button>';
+								createTarget+='<button class="stores-detailed" data-id="'+ membersData[i].id +'">详情</button></div></li>';
+								$(receiveTarget).html(createTarget);
+							}
+						}
+						// console.log(membersData,'返回数据');
+					},
+					error:function(err) {
+						console.log(err.status,'失败返回');
+					},
+				});
+			}
+			getMemberInfo('member/getOnlineMemeberList',token,'','.show-data');
+			
+			
+			// 点击详情跳转
+			$('.show-data').on('click','.stores-detailed',function(){
+				let id = $(this).attr("data-id");
+				$(window).attr('location','/page/memberManagement/memberDetail.html?id=' + id);
+			});
+			
+			// 点击删除按钮
+			$('.show-data').on('click','.stores-clear',function(){
+				let id = $(this).attr("data-id");
+				console.log(typeof id);
+				$.ajax({
+					// 请求头信息
+					headers:{
+						"Accept": "application/json",
+						"token":token
+					},
+					// 请求方式
+				    type:"POST",
+					// 请求属于同步还是异步
+				    async:false,
+					// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+				    dataType:'json',
+				    url:u+"member/delete",
+					contentType : "application/x-www-form-urlencoded",
+					data:{'id':id},
+				    success:function (data) {
+						console.log(data);
+						if(data.success && data.msg == '删除会员成功！'){
+							createTarget = "";
+							alert(data.msg);
+							getMemberInfo('member/getOnlineMemeberList',token,'','.show-data');
+							window.location.reload();
+						}
+					},
+					error:function(err) {
+						console.log(err.status,'失败返回');
+					},
+				});
+			});
+		})
+	}
+</script>
+</html>

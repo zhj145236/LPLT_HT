@@ -1,0 +1,201 @@
+.calendar_wrap {
+	min-height: 300px;
+	border: solid 2px #57abff;
+	display: -webkit-box;
+	display: -moz-box;
+	display: box;
+	font-family: "微软雅黑";
+	color: #444;
+}
+
+.calendar_wrap table {
+	border-collapse: collapse;
+	font-size: 14px;
+	width: 100%;
+	margin-top: 5px;
+}
+
+.calendar_wrap table tr {
+	border-bottom: solid 1px #eee;
+	line-height: 24px;
+}
+
+.calendar_wrap table th {}
+
+.calendar_wrap table td {
+	height: 45px;
+	text-align: center;
+}
+@media only screen and (max-width:640px) {
+	.calendar_wrap table td {
+		min-width:40px;
+	}
+	.calendar_wrap table td p {
+		max-width: 40px;
+	}	
+}
+
+.calendar_wrap table td p {
+	line-height: 20px;
+	margin: 0 auto;
+	cursor: pointer;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.calendar_wrap table td p:nth-of-type(2) {
+	font-size: 12px;
+}
+
+.calendar_wrap table td .term {
+	color: #e02d2d;
+}
+
+.calendar_wrap table td .display_prev_month {
+	color: #eee;
+}
+
+.calendar_wrap table td .display_next_month {
+	color: #eee;
+}
+
+.calendar_wrap .calendar_weather {
+	width: 100px;
+	background: #57abff;
+}
+
+.calendar_wrap button {
+	border: none;
+	background: none;
+	cursor: pointer;
+	border: solid 1px #ccc;
+	height: 22px;
+	vertical-align: top;
+	margin-top: 4px;
+	padding: 0 5px;
+	border-radius: 3px;
+	background: #fff;
+	outline: none;
+}
+
+.calendar_wrap button:hover {
+	background: #eee;
+}
+
+.calendar_wrap button:active {
+	background: #ccc;
+}
+
+.calendar_wrap * {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.calendar_wrap .calendar_png {
+	background: url(icons_0e814c16.png);
+}
+
+
+/* 媒体查询 */
+
+.calendar_wrap .calendar_body {
+	-webkit-box-flex: 1;
+	-moz-box-flex: 1;
+	box-flex: 1;
+	padding: 10px;
+}
+
+.calendar_wrap .calendar_body .calendar_header {
+	height: 30px;
+	line-height: 30px;
+	padding-bottom: 5px;
+	border-bottom: solid 1px #5caeff;
+}
+
+.calendar_wrap .calendar_body .calendar_header .calendar_header_select {
+	height: 20px;
+	line-height: 20px;
+	display: inline-block;
+	border: solid 1px #ccc;
+}
+
+.calendar_wrap .calendar_body .calendar_header .calendar_header_select .calendar_select {
+	display: inline-block;
+	min-width: 3.5em;
+	font-size: 12px;
+	padding-left: 5px;
+	padding-right: 19px;
+	position: relative;
+}
+
+.calendar_wrap .calendar_select .calendar_select_v {
+	cursor: pointer;
+}
+
+.calendar_wrap .calendar_select .calendar_select_v::after {
+	content: "";
+	position: absolute;
+	right: 16px;
+	height: 100%;
+	width: 1px;
+	top: 0;
+	background: #ccc;
+}
+
+.calendar_wrap .calendar_select .calendar_select_v .calendar_ico {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	vertical-align: text-bottom;
+	font-style: normal;
+	overflow: hidden;
+	background-position: -408px -144px;
+	position: absolute;
+	right: 1px;
+	top: 50%;
+	margin-top: -7px;
+}
+
+.calendar_wrap .calendar_select .calendar_select_item {
+	display: none;
+	position: absolute;
+	width: 100%;
+	background: #fff;
+	left: -1px;
+	top: 100%;
+	margin-top: -1px;
+	max-height: 150px;
+	overflow: auto;
+	border: solid 1px #ccc;
+}
+
+.calendar_wrap .calendar_select.show .calendar_select_item {
+	display: block;
+}
+
+.calendar_wrap .calendar_select .calendar_select_item li {
+	margin-left: 5px;
+	line-height: 20px;
+	height: 20px;
+	overflow: hidden;
+	cursor: pointer;
+}
+
+.calendar_wrap .calendar_body .calendar_header .calendar_select_item::-webkit-scrollbar {
+	width: 5px;
+}
+
+.calendar_wrap .calendar_body .calendar_header .calendar_select_item::-webkit-scrollbar-track {
+	background-color: #ccc;
+}
+
+.calendar_wrap .calendar_body .calendar_header .calendar_select_item::-webkit-scrollbar-thumb {
+	background-color: rgba(0, 0, 0, 0.2);
+}
+
+.calendar_wrap .calendar_slide {
+	width: 100px;
+	background: #5caeff;
+}

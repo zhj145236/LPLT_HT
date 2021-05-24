@@ -1,0 +1,106 @@
+@charset "utf-8";
+/* CSS Document */
+/* 新增门店 */
+body{
+	overflow-y: hidden;
+}
+.hiden-data{
+	font-style: 20px;
+	font-weight: 600;
+	height: 200px;
+	line-height: 200px;
+	color: #8C8C8C;
+}
+.add-stores{
+	padding: 20px 0;
+	border-bottom: 1px solid #b5b5b5;
+}
+.add-stores-btn{
+	text-align: left!important;
+	text-align: -moz-left!important;
+	text-align: -webkit-left!important;
+	display: block;
+	padding: 16px 38px;
+	background-color: #1578AE;
+	font-size: 16px;
+	cursor:pointer;
+}
+.add-stores-btn a{
+	color: #FFFFFF;
+}
+/* 门店列表样式 */
+.stores-list{
+	max-height: 460px;
+	overflow-y:auto;
+	margin-top: 6px;
+}
+/* 修改滚动条样式 */
+.stores-list::-webkit-scrollbar {
+	width: 1px;    
+	/*height: 4px;*/
+}
+.stores-list::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+	background: rgba(0,0,0,0.2);
+}
+.stores-list::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+	border-radius: 0;
+	background: rgba(0,0,0,0.1);
+}
+
+.stores-list-li{
+	text-align: -moz-left;
+	text-align: -webkit-left;
+	text-align: left;
+	display: flex;
+	flex-direction:row;
+	justify-content:space-between;
+	align-items:center;
+	padding: 16px 20px;
+	border-bottom: 1px solid #dedede;
+}
+.stores-img{
+	width: 60px;
+	height: 60px;
+	border-radius: 100%;
+	overflow: hidden;
+	border: 1px solid #ccc;
+}
+.stores-img img{
+	width: 60px;
+	height: auto;
+}
+.change-style{
+	margin-left: 20px;
+	height: 60px;
+	line-height: 60px;
+}
+.stores-clear,.stores-detailed{
+	background: #ff0101;
+	font-size: 16px;
+	display: block;
+	cursor:pointer;	
+}
+.stores-clear{
+	padding: 0 50px;
+	height: 40px;
+	line-height: 40px;
+	color: #FFFFFF;
+}
+.stores-detailed{
+	background: #FF9800;
+	margin-left: 30px;
+	display: block;
+	color: #FFFFFF;
+	padding: 0 50px;
+	height: 40px;
+	line-height: 40px;
+}
+.stores-list-li-left,.stores-list-li-right{
+	display: flex;
+	flex-direction:row;
+	justify-content:space-between;
+}
+	

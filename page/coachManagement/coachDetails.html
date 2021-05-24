@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link href="../../css/coachDetailed.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../../js/template.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/jquery-3.4.1.min.js"></script>
+<title>教练详情</title>
+</head>
+<body>
+	<!-- 抬头标题 -->
+	<div class="add-stores-count">
+		<!-- 顶部位置提示 -->
+		<div class="bj-color-count">
+			<form action="#" method="post" enctype="multipart/form-data">
+				<div class="count-top">
+					<p>教练详情</p>
+				</div>
+				<!-- 教练名称 -->
+				<div class="stores-add unified-style">
+					<p>教练名称：</p>
+					<input type="text" name="coursename" class="coursename samestyle" placeholder="请输入教练名称" value="" />
+				</div>
+				<!-- 教练电话 -->
+				<div class="stores-show-img unified-style">
+					<p>教练电话：</p>
+					<input type="text" name="coachtel" class="coachtel samestyle" placeholder="请输入教练电话" value="" />
+				</div>
+				<!-- 教练地址 -->
+				<div class="stores-show-img unified-style">
+					<p>教练地址：</p>
+					<input type="text" name="address" class="address samestyle" placeholder="请输入教练地址" value="" />
+				</div>
+				<!-- 主教课程 -->
+				<div class="stores-show-img unified-style">
+					<p>主教课程：</p>
+					<input type="text" name="skill" class="skill samestyle" placeholder="请输入教练主教课程" value="" />
+				</div>
+				<!-- 教练签名 -->
+				<div class="stores-show-img unified-style">
+					<p>教练签名：</p>
+					<input type="text" name="signature" class="signature samestyle" placeholder="请输入教练签名" value="" />
+				</div>
+				<!-- 教练性别 -->
+				<div class="stores-product-img unified-style">
+					<p>教练性别：</p>
+					<label><input class="coach-sex-male" type="radio" name="sex" value="男">男</label>
+					<label><input class="coach-sex-female" type="radio" name="sex" value="女">女</label>
+				</div>
+				<!-- 教练图像 -->
+				<div class="stores-facilities unified-style">
+					<p>个人图像：</p>
+					<div class="stores-show-img-upload-div self-img">
+						<div class="stores-show-img-upload">图像上传</div>
+						<input type="file" name="storesproduct" id="uploadProduct" />
+					</div>
+					<ul id="imageProduct"></ul>
+				</div>
+				<!-- 资质认证 -->
+				<div class="stores-facilities unified-style">
+					<p>资质认证(可不上传)：</p>
+					<div class="stores-show-img-upload-div honor-img">
+						<div class="stores-show-img-upload">证照上传</div>
+						<input type="file" name="storesshow" id="uploadShow" />
+					</div>
+					<ul id="imgShow"></ul>
+				</div>
+				<!-- 工作经历 -->
+				<div class="stores-introduce unified-style">
+					<p>专业简介(可不填写)：</p>
+					<textarea type="text" name="storesintroduce" class="storesintroduce samestyle" placeholder="请填写工作经历(可不填)"></textarea>
+				</div>
+				<!-- 提交或取消 -->
+				<div class="determine-cancel">
+					<input class="determine-inp" type="text" value="提交" />
+					<input class="cancel-inp" type="button" value="取消" />
+				</div>
+			</form>
+		</div>
+	</div>
+</body>
+<script>
+	// 设置门店信息
+	let storeData = "",
+	storeImg = "",
+	storeUrl = window.location.href,
+	needUrl = storeUrl.split('?')[1],
+	needId = needUrl.split('&'),
+	storeId = needId[0].split('=')[1],
+	coachId = needId[1].split('=')[1];
+	u = getUrl();
+	storeData = JSON.parse(localStorage.getItem("userData")); // 门店名称
+	if(storeData == null || storeData == undefined){
+		$(window).attr('location','/page/login.html');
+	}else{
+		$(document).ready(function(){
+			// 进入页面后先获取
+			$.post(u+'memeber/coach/get',{"id":coachId},function(res){
+				let datas = res.data;
+				console.log(res);
+				$('.coursename').attr('value',datas.name); // 教练姓名
+				$('.coachtel').attr('value',datas.tel); // 教练电话
+				$('.address').attr('value',datas.address); // 教练地址
+				$('.skill').attr('value',datas.skill); // 教练主教课程
+				$('.signature').attr('value',datas.signature); // 教练签名
+				$('.storesintroduce').append(datas.experience); // 工作经验				
+				$('#imageProduct').append('<li class="newLi"><img src="'+ u + datas.headpic + '" /><p class="newP">删除</p></li>'); // 教练图像
+				if(datas.gender == "男"){
+					$('.coach-sex-male').attr('checked','checked'); // 教练性别男
+				}else if(datas.gender == "女"){
+					$('.coach-sex-female').attr('checked','checked'); // 教练性别女
+				}
+				if(datas.honor != ""){
+					$('#imgShow').append('<li class="newLi"><img src="'+ u + datas.honor + '" /><p class="newP">删除</p></li>'); // 教练资质
+				}
+				
+				// 删除图片封装
+				function clearImg(hidenNode,showBox,clickNode){
+					$(hidenNode).hide();
+					$(showBox).on('click',clickNode,function(){
+						$(this).parentsUntil(showBox).remove();
+						$(hidenNode).show();
+					});
+				}
+				
+				// 删除个人图片	
+				if(datas.headpic != ""){
+					clearImg('.self-img','#imageProduct','.newP');
+				}		
+				// 删除资质图片
+				if(datas.honor != ""){
+					clearImg('.honor-img','#imgShow','.newP');
+				}	
+			});
+			
+			
+			// 点击提交按钮保存数据
+			$('.determine-inp').click(function(){
+				let coursenameVal = $("input[name='coursename']").val(), // 教练名称
+				coachtelVal = $("input[name='coachtel']").val(), // 教练手机号
+				addressVal = $("input[name='address']").val(), // 教练地址
+				skillVal = $("input[name='skill']").val(), // 主教课程
+				signatureVal = $("input[name='signature']").val(), // 个性签名
+				sexVal = $('input[name="sex"]:checked').val(), // 教练性别
+				storesintroduceVal = $('textarea[name="storesintroduce"]').val(), // 教练工作简介
+				imageProductSrc = $("#imageProduct .newLi").children('img').attr("src"); // 教练图像
+				imgShowSrc = $("#imgShow .newLi").children('img').attr("src"); // 教练资质图
+				// console.log(dealProductSrc,dealShowSrc);
+				dealShowSrc = ""; // 教练资质处理变量
+				dealProductSrc = ""; // 教练图像处理变量
+				
+				// 教练资质图像处理
+				if(imgShowSrc == undefined){
+					dealShowSrc = "";
+				}else{
+					dealShowSrc = 'api' + imgShowSrc.split('api')[1]; // 处理后的教练资质图
+				}
+				
+				// 验证必要字段
+				/** 教练名称验证 **/
+				if(coursenameVal == "" || coursenameVal == undefined || coursenameVal == null){
+					alert('名称不能为空');
+					return;
+				}
+				/** 教练手机号验证 **/
+				if(coachtelVal == "" || coachtelVal == undefined || coachtelVal == null){
+					alert('手机号不能为空');
+					return;
+				}
+				/** 教练地址验证 **/
+				if(addressVal == "" || addressVal == undefined || addressVal == null){
+					alert('地址不能为空');
+					return;
+				}
+				/** 主教课程验证 **/
+				if(skillVal == "" || skillVal == undefined || skillVal == null){
+					alert('主教课程不能为空');
+					return;
+				}
+				/** 性别验证 **/
+				if(sexVal == "" || sexVal == undefined || sexVal == null){
+					alert('性别不能为空');
+					return;
+				}
+				/** 教练图像验证 **/
+				if(imageProductSrc == undefined){
+					alert('教练图像不能为空');
+					return;
+				}else{
+					dealProductSrc = 'api' + imageProductSrc.split('api')[1]; // 处理后的教练图像
+				}
+				
+				// 没有填写工作简历的时候默认为空，不传undefined
+				if(storesintroduceVal == "" || storesintroduceVal == undefined || storesintroduceVal == null){
+					storesintroduceVal = "";
+				}
+				// 没有填写签名的时候默认为空，不传undefined
+				if(signatureVal == "" | signatureVal == undefined || signatureVal == null){
+					signatureVal = "";
+				}
+				
+				$.ajax({
+					// 请求头信息
+					headers:{
+						"Accept": "application/json",
+						"token":JSON.parse(localStorage.getItem("userData")).map.token
+					},
+					// 请求方式
+					type:"POST",
+					// 请求属于同步还是异步
+					async:false,
+					// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+					dataType:'json',
+					url:u+"memeber/coach/save",
+					contentType : "application/json",
+					data:JSON.stringify({
+						"id":coachId, // 教练id
+						"address": addressVal, // 地址
+						"experience": storesintroduceVal, // 工作经验
+						"gender": sexVal, // 性别
+						"headpic": dealProductSrc, // 图像地址
+						"honor": dealShowSrc, // 资历认证
+						"name": coursenameVal, // 教练名称
+						"signature": signatureVal, // 教练签名
+						"skill": skillVal, // 主教课程
+						"store_id": storeId, // 门店id
+						"tel": coachtelVal, // 教练电话号码
+					}),
+					success:function (resed) {
+						if(resed.code == 200 && resed.msg == '保存成功！'){
+							alert('保存成功');
+							$(window).attr('location','/page/coachManagement/coachManagement.html');
+						}else{
+							alert('保存失败');
+						}
+					},
+					error:function(err) {
+						console.log(err.status,'失败返回');
+					},				
+				});
+			});
+			
+			// 点击取消
+			$('.cancel-inp').click(function(){
+				$(window).attr('location','/page/coachManagement/coachManagement.html');
+			});
+			
+		});
+		
+	}
+	uploadImg('uploadShow','imgShow',1);
+	uploadImg('uploadProduct','imageProduct',1);
+</script>
+</html>

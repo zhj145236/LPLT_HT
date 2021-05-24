@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/javascript" src="../js/jquery-3.4.1.min.js"></script>
+<title></title>
+</head>
+<body>
+	<!-- <input id="my_invite" type="text" name="txt" value="123" />
+	<div class="btn_one">测试</div> -->
+	<!-- <input type=text value="123" />
+	<button>click</button> -->
+	<button id="id1" class="cs1">按钮1</button>
+	<button id="id2" class="cs1">按钮2</button>
+	<button id="id3" class="cs1">按钮3</button>
+	<button id="id4" class="cs1">按钮4</button>
+	<button id="id5" class="cs1">按钮5</button>
+	<script>
+		
+		$('.cs1').click(function(){
+			alert($(this).attr('id'));
+		});
+		
+		// $(function(){
+		// 	var inputVal;
+		// 	$('input').on('propertychange input',function(){
+		// 		inputVal = $(this).val();
+		// 	});
+		// 	$('button').on('click',function(){
+		// 		alert('你输入的字符是'+inputVal);
+		// 	});
+		// });
+		
+		// var invite;
+		// $('.btn_one').click(function(){
+		// 	window.invite = $('#my_invite').val();
+		// })
+		// console.log(invite);
+		// var s="123/456/789/0";
+		// s=s.substr(0,s.indexOf("/")); 
+		// console.log(s,'测试数据');
+		// var number;
+		// window.onload = function(){
+		// 	$(".cs").on("click",function(){
+		// 		var height = 100;
+		// 		number = height;
+		// 	})
+		// }
+		// function a(){
+		// 	if(number != undefined){
+		// 		alert(number);//这里number就已经在onload函数里被重新赋值了
+		// 	}
+		// }
+		
+		// function add(){
+		// 	$(".cs").on("click",function(){
+		// 		var height = 100;
+		// 		number = height;
+		// 		return number
+		// 	});
+		// }
+		// console.log(add());
+	</script>
+</body>
+</html>

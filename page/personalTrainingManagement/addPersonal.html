@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link href="../../css/addPersonal.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="../../css/xcConfirm.css"/>
+<script type="text/javascript" src="../../js/template.js"></script>
+<script type="text/javascript" src="../../js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="../../js/timePacker.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script src="../../js/xcConfirm.js" type="text/javascript" charset="utf-8"></script>
+<title>新增私课</title>
+</head>
+<body>
+	<!-- 抬头标题 -->
+	<div class="add-stores-count">
+		<!-- 顶部位置提示 -->
+		<div class="bj-color-count">
+			<form action="#" method="post" enctype="multipart/form-data">
+				<div class="count-top">
+					<p>新增私课</p>
+				</div>
+				<!-- 课程名称 -->
+				<div class="stores-add unified-style">
+					<p>课程名称：</p>
+					<input type="text" name="classname" class="samestyle private-class-name" placeholder="课程名称" value="" />
+				</div>
+				<!--课程时长 -->
+				<div class="stores-facilities unified-style">
+					<p>课程时长：</p>
+					<input type="text" name="lentime" class="samestyle private-class-lentime" placeholder="请输课程时长" value="" />
+				</div>
+				<!-- 课程图片 -->
+				<div class="stores-facilities unified-style">
+					<p>课程图片：</p>
+					<div class="stores-show-img-upload-div">
+						<div class="stores-show-img-upload">展示图上传</div>
+						<input type="file" name="storesshow" id="uploadShow" />
+					</div>
+					<ul id="imgShow"></ul>
+				</div>
+				<!-- 可预约时间点 -->
+				<div class="stores-introduce unified-style">
+					<p>可预约时间点：</p>
+					<textarea type="text" name="storesintroduce" class="storesintroduce samestyle" placeholder="时间格式：08:00,09:09，两个时间点请用英文逗号隔开"></textarea>
+				</div>
+				<!--月课程设置 -->
+				<div class="stores-facilities unified-style">
+					<p>月课程设置：</p>
+					<input type="text" name="monthclass" class="samestyle monthclass" placeholder="月课程设置" value="" />
+				</div>
+				<!-- 提交或取消 -->
+				<div class="determine-cancel">
+					<input class="determine-inp" type="text" value="提交" />
+					<input class="cancel-inp" type="text" value="取消" />
+				</div>
+			</form>
+		</div>
+	</div>
+</body>
+<script>
+	// 设置门店信息
+	let storeData = "",
+	storeImg = "",
+	u = getUrl(),
+	storeUrl = window.location.href,
+	needUrl = storeUrl.split('?')[1],
+	needId = needUrl.split('=')[1], // 教练id
+	storesList="";
+	storeData = JSON.parse(localStorage.getItem("userData")); // 门店名称
+	if(storeData == null || storeData == undefined){
+		$(window).attr('location','/page/login.html');
+	}else{
+		// 弹出框插件
+		$(".monthclass").click(function(){
+			let createData = "";
+			for(let i=1;i<32;i++){
+				i=i<10?'0'+i:i;
+				createData+='<label><input class="set-month-inp" type="checkbox" name="checkbox' + i + '" value="' + i + '" checked=""/>' + i + '号</label>';
+			}
+			let txt=  createData,
+			now = new Date(),
+			time = now.getFullYear() + "年" +((now.getMonth()+1)<10?"0":"")+(now.getMonth()+1)+"月",
+			monthclassVal = "";
+			option = {
+				title: time,
+				btn: parseInt("0011",2),
+				onOk: function(){
+					$.each($('input:checkbox:checked'),function(){
+						monthclassVal += $(this).val() + ',';
+					});
+					$('.monthclass').attr('value',monthclassVal.substring(0,monthclassVal.length-1));
+				}
+			}
+			window.wxc.xcConfirm(txt, "custom", option);
+		});
+		
+		// 点击提交按钮
+		$('.determine-inp').click(function(){
+			let privateClassNameVal = $("input[name='classname']").val(), // 私课名称
+			lentimeVal = $("input[name='lentime']").val(), // 课程时常
+			storesintroduceVal = $("textarea[name='storesintroduce']").val(), // 可预约时间点
+			monthclassVal = $("input[name='monthclass']").val(); // 月课程时间设置
+			imgShowSrc = $("#imgShow .newLi").children('img').attr("src"), // 课程图片
+			needSrcUrl = "";
+			// 字段验证不能为空
+			/** 课程名称验证 **/
+			if(privateClassNameVal == "" || privateClassNameVal == undefined || privateClassNameVal == null){
+				alert("私课名称不能为空");
+				return;
+			}
+			/** 课程时常验证 **/
+			if(lentimeVal == "" || lentimeVal == undefined || lentimeVal == null){
+				alert("课程时常不能为空");
+				return;
+			}
+			/** 可预约时间点验证 **/
+			if(storesintroduceVal == "" || storesintroduceVal == undefined || storesintroduceVal == null){
+				alert("可预约时间点不能为空");
+				return;
+			}
+			/** 月课程批量设置验证 **/
+			if(monthclassVal == "" || monthclassVal == undefined || monthclassVal == null){
+				alert("月课程设置不能为空");
+				return;
+			}
+			/** 课程图片验证 **/
+			if(imgShowSrc == undefined){
+				alert("课程图片不能为空");
+				return;
+			}else{
+				needSrcUrl = 'api' + imgShowSrc.split("api")[1];
+			}
+			
+			$.ajax({
+				// 请求头信息
+				headers:{
+					"Accept": "application/json",
+					"token":storeData.map.token
+				},
+				// 请求方式
+				type:"POST",
+				// 请求属于同步还是异步
+				async:false,
+				// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+				dataType:'json',
+				url:u+"memeber/coachcourse/saveMyCourse",
+				contentType : "application/json",
+				data:JSON.stringify({
+					"coachId": needId, // 教练id
+					"courseName": privateClassNameVal, // 课程名称
+					"duration": Number(lentimeVal), // 课程时长
+					"logo": needSrcUrl, // 课程图片
+					"monthPlan": monthclassVal, // 月计划
+					"timePoints": storesintroduceVal, // 时间点
+				}),
+				success:function (groupData) {
+					if(groupData.code == 200 && groupData.msg == '私课课程设置成功'){
+						$(window).attr('location','/page/personalTrainingManagement/personalTrainingManagement.html');
+					}else{
+						console.log(groupData);
+						alert('新增失败');
+					}
+				},
+				error:function(err) {
+					console.log(err.status,'失败返回');
+				},
+			});
+		});
+		// 点击取消执行按钮
+		$('.cancel-inp').click(function(){
+			$(window).attr('location','/page/personalTrainingManagement/personalTrainingManagement.html');
+		});
+		uploadImg('uploadShow','imgShow',1);
+	}
+</script>
+</html>

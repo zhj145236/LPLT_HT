@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link href="../../css/addGroup.css" rel="stylesheet" type="text/css">
+<link href="../../css/calendar.css" rel="stylesheet" type="text/css">
+<link href="../../css/calendarDay.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../../js/template.js"></script>
+<script type="text/javascript" src="../../js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/timePacker.js"></script>
+<script type="text/javascript" src="../../js/calendar.js"></script>
+<title>团课详情</title>
+</head>
+<body>
+	<!-- 抬头标题 -->
+	<div class="add-stores-count">
+		<!-- 顶部位置提示 -->
+		<div class="bj-color-count">
+			<form action="#" method="post" enctype="multipart/form-data">
+				<div class="count-top">
+					<p>团课详情</p>
+				</div>
+				<!-- 选择时间 -->
+				<div class="stores-add unified-style">
+					<p>团课发布日期：</p>
+					<input type="text" id="beginData" name="beginData" class="releaseday samestyle" placeholder="请选择发布日期" value="" />
+				</div>
+				<!-- 选择时间 -->
+				<div class="stores-add unified-style">
+					<p>团课开始时间：</p>
+					<input type="text" id="startTimeId" name="starttime" class="starttime samestyle" placeholder="团课开始时间" value="" />
+				</div>
+				<!-- 选择时间 -->
+				<div class="stores-add unified-style">
+					<p>团课结束时间：</p>
+					<input type="text" id="endTimeId" name="endtime" class="endtime samestyle" placeholder="团课结束时间" value="" />
+				</div>
+				<!-- 星期几 -->
+				<div class="stores-add unified-style">
+					<p>选择星期模板：</p>
+					<select name="daytemplates" class="samestyle day-template"></select>
+					<input class="sureinp samestyle" name="sureinp" value="" />
+					<div class="count-top daytemplates-sure sureinp-sure">确定</div>
+				</div>
+				<!-- 团课名称 -->
+				<div class="stores-add unified-style">
+					<p>团课名称：</p>
+					<select name="groupnane" class="samestyle team-course"></select>
+					<input class="weekname samestyle" name="weekname" value="" />
+					<div class="count-top daytemplates-sure weekname-sure">确定</div>
+				</div>
+				
+				<!--教练名称 -->
+				<div class="stores-facilities unified-style">
+					<p>教练名称：</p>
+					<select name="groupnane" class="samestyle group-name"></select>
+					<input class="group-name-data samestyle" name="groupnamedata" value="" />
+					<div class="count-top daytemplates-sure groupname-sure">确定</div>
+				</div>
+				<!--场地名称 -->
+				<div class="stores-facilities unified-style">
+					<p>场地名称：</p>
+					<input type="text" name="sitename" class="samestyle site-name" placeholder="请输入场地名称" value="" />
+				</div>
+				<!--预约人数 -->
+				<div class="stores-facilities unified-style">
+					<p>预约人数：</p>
+					<input type="text" name="ordernum" class="samestyle sign-up-name" placeholder="请输入该团课最高预报人数" value="" />
+				</div>
+				<!-- 提交或取消 -->
+				<div class="determine-cancel">
+					<input class="determine-inp" type="text" value="提交" />
+					<input class="cancel-inp" type="text" value="取消" />
+				</div>
+			</form>
+		</div>
+	</div>
+</body>
+<script>
+	// 设置门店信息
+	let storeData = "",
+	storeImg = "",
+	u = getUrl(),
+	storeUrl = window.location.href,
+	needUrl = storeUrl.split('?')[1],
+	needUrlData = needUrl.split('&');
+	classId = needUrlData[0].split('=')[1], // 课程id
+	storesIdData = needUrlData[1].split('=')[1], // 门店id
+	storesList="";
+	storeData = JSON.parse(localStorage.getItem("userData")); // 门店名称
+	
+	
+	if(storeData == null || storeData == undefined){
+		$(window).attr('location','/page/login.html');
+	}else{
+		// 首次进入团课详情时加载数据并渲染
+		$(document).ready(function(){
+			$.post(u+"course/teamCourse/get", {
+				id:classId
+			}, function(data) {
+				let datas = data.data;
+				console.log(datas);
+				$('.releaseday').attr('value',datas.teachDate); // 团课发布时间
+				$('.starttime').attr('value',datas.starttime); // 团课开始时间
+				$('.endtime').attr('value',datas.endtime); // 团课结束时间
+				$('.weekname').attr('value',datas.courseName); // 团课名称
+				$('.group-name-data').attr('value',datas.coachName); // 教练名称
+				$('.site-name').attr('value',datas.place); // 场地名称
+				$('.sign-up-name').attr('value',datas.maxStudent); // 最高报名人数
+			});
+		});
+		
+		// 重新修改数据操作数据
+		$(document).ready(function(){
+			let newArr = [
+				{"week":"请选择星期模板","day":""},
+				{"week":"星期一","day":1},
+				{"week":"星期二","day":2},
+				{"week":"星期三","day":3},
+				{"week":"星期四","day":4},
+				{"week":"星期五","day":5},
+				{"week":"星期六","day":6},
+				{"week":"星期日","day":7},
+			],
+			dayTemplate = '',
+			weekIndex = "",
+			chooseWeekDaytemplates = "", // 选择星期
+			chooseWeekDaytemplatesVal="", // 选择星期的value值
+			groupNameSureData = ""; // 教练姓名
+			for(let f in newArr){
+				dayTemplate+='<option value="' + newArr[f].day + '">' + newArr[f].week + '</option>';
+				$('.day-template').html(dayTemplate);
+			}		
+			// 获取门店所有教练信息
+			$.ajax({
+				// 请求头信息
+				headers:{
+					"Accept": "application/json",
+					"token":storeData.map.token
+				},
+				// 请求方式
+				type:"POST",
+				// 请求属于同步还是异步
+				async:false,
+				// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+				dataType:'json',
+				url:u+"memeber/coach/list",
+				contentType : "application/json",
+				data:JSON.stringify({
+					"store_id":storesIdData
+				}),
+				success:function (res) {
+					let effectiveData = res.page.rows;
+					// console.log(effectiveData);
+					for(let m in effectiveData){
+						groupNameSureData+='<option value="' + effectiveData[m].id + '">' + effectiveData[m].name + '</option>';
+						$('.group-name').html(groupNameSureData);
+					}
+				},
+				error:function(err) {
+					console.log(err.status,'失败返回');
+				},
+			});
+			
+			// 教练名称确定按钮
+			$('.groupname-sure').click(function(){
+				let groupNameVal = $(".group-name").find("option:selected").text();
+				$('.group-name-data').attr('value',groupNameVal);
+			});
+			
+			// 获取星期模板的数据
+			$('.day-template').change(function(){
+				chooseWeekDaytemplates = $(".day-template").find("option:selected").text();
+				chooseWeekDaytemplatesVal = $(".day-template").val();
+			});
+			
+			// 点击星期模板的确定按钮
+			$('.sureinp-sure').click(function(){
+				if(chooseWeekDaytemplates != "" && chooseWeekDaytemplatesVal != ""){	
+					$('.sureinp').attr('value',chooseWeekDaytemplates);
+					$.post(u+"/course/weekPlan/getWeekTemplate", {
+						storeId:storesIdData,
+						weekIndex:chooseWeekDaytemplatesVal
+					}, function(data) {
+						let datas = data.data;
+						// console.log(datas);
+						for(let s in datas){
+							for(let i in datas[s]){
+								storesList+='<option value="' + datas[s][i].id + '" imgSrc="' + datas[s][i].imageDesc + '" getDesc="' + datas[s][i].desc + '">' + datas[s][i].course + '</option>';
+								$('.team-course').html(storesList);
+							}
+						}
+					});
+				}else{
+					alert('请选择有效的星期');
+				}
+				storesList=""; // 重置页面渲染
+			});
+			
+			// 课程名称确定按钮
+			$('.weekname-sure').click(function(){
+				let teamCourseVal = $(".team-course").find("option:selected").text();
+				$('.weekname').attr('value',teamCourseVal);
+			});
+			
+			// 信息提交
+			$('.determine-inp').click(function(){
+				let releasedayVal = $('.releaseday').val(), // 团课发布日期
+				starttimeVal = $('.starttime').val(), // 团课开始时间
+				endtimeVal = $('.endtime').val(), // 团课结束时间
+				siteNameVal = $('.site-name').val(), // 场地名称
+				signUpNameVal = $('.sign-up-name').val(), // 最高报名人数
+				weeknameVal = $('.weekname').val(), // 团课名称
+				groupNameDataVal = $('.group-name-data').val(); // 教练名称
+				descVal = $('.team-course').find("option:selected").attr('getDesc'), // 团课内容
+				imageDescVal = $('.team-course').find("option:selected").attr('imgSrc'); // 团课内容图片
+				groupIdVal = $('.group-name').find("option:selected").attr('value'); // 教练id
+				
+				// 提交字段验证
+				/** 发布日期验证 **/
+				if(releasedayVal == "" || releasedayVal == undefined || releasedayVal == null){
+					alert('请输入发布日期');
+					return;
+				}
+				/** 团课开始时间验证 **/
+				if(starttimeVal == "" || starttimeVal == undefined || starttimeVal == null){
+					alert('请输入课程开始时间');
+					return;
+				}
+				/** 团课结束时间验证 **/
+				if(endtimeVal == "" || endtimeVal == undefined || endtimeVal == null){
+					alert('请输入课程结束时间');
+					return;
+				}
+				/** 团课场地名称验证 **/
+				if(siteNameVal == "" || siteNameVal == undefined || siteNameVal == null){
+					alert('请输入团课场地名称');
+					return;
+				}
+				/** 团课最高报名人数验证 **/
+				if(signUpNameVal == "" || signUpNameVal == undefined || signUpNameVal == null){
+					alert('请输入团课报名人数');
+					return;
+				}
+				/** 团课名称验证 **/
+				if(weeknameVal == "" || weeknameVal == undefined || weeknameVal == null){
+					alert('请输入团课名称');
+					return;
+				}
+				/** 团课教练验证 **/
+				if(groupNameDataVal == "" || groupNameDataVal == undefined || groupNameDataVal == null){
+					alert('请输入团课教练');
+					return;
+				}
+				
+				$.ajax({
+					// 请求头信息
+					headers:{
+						"Accept": "application/json",
+						"token":storeData.map.token
+					},
+					// 请求方式
+					type:"POST",
+					// 请求属于同步还是异步
+					async:false,
+					// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+					dataType:'json',
+					url:u+"course/teamCourse/save",
+					contentType : "application/json",
+					data:JSON.stringify({
+						"coachName": groupNameDataVal, // 教练名称
+						"coeachId": groupIdVal, // 教练id
+						"courseName": weeknameVal, // 课程名称
+						"desc": descVal, // 描述文字
+						"descImage": imageDescVal, // 课程图片
+						"endtime": endtimeVal, // 结束时间
+						"maxStudent": Number(signUpNameVal), // 最大报名人数
+						"starttime": starttimeVal, // 课程开始时间
+						"storeId": storesIdData, // 门店id
+						"teachDate": releasedayVal, // 哪天上课
+						"place": siteNameVal ,// 场地名称
+						"id": classId, // 课程id
+					}),
+					success:function (groupData) {
+						if(groupData.code == 200 && groupData.msg == '保存成功！'){
+							$(window).attr('location','/page/groupClassManagement/groupClassManagement.html');
+						}else{
+							alert('新增失败');
+						}
+					},
+					error:function(err) {
+						console.log(err.status,'失败返回');
+					},
+				});
+				
+			});
+			
+			// 点击取消执行按钮
+			$('.cancel-inp').click(function(){
+				$(window).attr('location','/page/groupClassManagement/groupClassManagement.html');
+			});
+			
+			// 时间选择器
+			$("#startTimeId").bind('click',function(event){timePacker($(this),event)}); // input框
+			$("#endTimeId").bind('click',function(event){timePacker($(this),event)}); // input框
+			
+			// 日历插件
+			new calendar({
+				el : 'beginData',
+				lunar : true
+			});
+		});
+	}
+	
+	
+</script>
+</html>

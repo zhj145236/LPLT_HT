@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link href="../../css/courseDetailed.css" rel="stylesheet" type="text/css">
+<link href="../../css/calendarDay.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../../js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="../../js/template.js"></script>
+<script type="text/javascript" src="../../js/jquery.min.js"></script>
+<script type="text/javascript" src="../../js/timePacker.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<title>课程详情</title>
+</head>
+<body>
+	<!-- 抬头标题 -->
+	<div class="add-stores-count">
+		<!-- 顶部位置提示 -->
+		<div class="bj-color-count">
+			<form class="bj-color-count-form" action="#" method="post" enctype="multipart/form-data">
+				<div class="count-top">
+					<p></p>
+				</div>
+				<!-- 课程名称 -->
+				<div class="stores-add unified-style">
+					<p>课程名称：</p>
+					<input type="text" name="coursename" class="coursename samestyle" placeholder="请输入课程名称" value="" />
+				</div>
+				<!-- 开始时间 -->
+				<div class="stores-show-img unified-style">
+					<p>开始时间：</p>
+					<input type="text" id="startTimeId" name="starttime" class="starttime samestyle" placeholder="请输入课程开始时间" value="" />
+				</div>
+				<!-- 结束时间 -->
+				<div class="stores-product-img unified-style">
+					<p>结束时间：</p>
+					<input type="text" id="endTimeId" name="endtime" class="endtime samestyle" placeholder="请输入课程结束时间" value="" />
+				</div>
+				<!-- 课程图片 -->
+				<div class="stores-facilities unified-style">
+					<p>课程图片：</p>
+					<div class="stores-show-img-upload-div">
+						<div class="stores-show-img-upload">展示图上传</div>
+						<input type="file" name="storesshow" id="uploadShow" />
+					</div>
+					<ul id="imgShow"></ul>
+				</div>
+				<!-- 课程简介 -->
+				<div class="stores-introduce unified-style">
+					<p>课程简介：</p>
+					<textarea type="text" name="storesintroduce" class="storesintroduce samestyle" placeholder="请填写课程简介"></textarea>
+				</div>
+				<!-- 提交或取消 -->
+				<div class="determine-cancel">
+					<input class="determine-inp" type="text" value="提交" />
+					<input class="cancel-inp" type="button" value="取消" />
+				</div>
+			</form>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	
+	// json格式提交数据 获取所有门店数据信息接口
+	let requestData = JSON.parse(localStorage.getItem("userData"));
+	if(requestData == null || requestData == undefined){
+		// $(window).attr('location','/page/login.html');
+	}else{
+		let classUrl = window.location.href,
+		needUrl = classUrl.split('?'),
+		classId = needUrl[1],
+		classIdData = classId.split("="),
+		classIdDataNum = classIdData[1],
+		u = getUrl();
+		
+		// 获课程取详情接口
+		$(document).ready(function() {
+			let classDetail="";
+			// console.log(classIdDataNum,'测试数据');
+			// 课程详情
+			$.post(u+"course/weekPlan/get", {
+				id:classIdDataNum,
+			}, function(deteilData) {
+				let datas = deteilData.data,tmp=datas.weekIndex,day;
+				console.log(datas);
+				switch (tmp) {
+				  case 1:day = "星期一";break;
+				  case 2:day = "星期二";break;
+				  case 3:day = "星期三";break;
+				  case 4:day = "星期四";break;
+				  case 5:day = "星期五";break;
+				  case 6:day = "星期六";break;
+				  case 7:day = "星期日";break;
+				}
+				$('.count-top p').append(day); // 星期几
+				$('.coursename').attr('value',datas.courseName); // 课程名称
+				$('.coursename').attr('storeId',datas.storeId); // 门店id
+				$('.coursename').attr('weekIndex',datas.weekIndex); // 星期几
+				$('.starttime').attr('value',datas.starTime); // 课程开始时间
+				$('.endtime').attr('value',datas.endTime); // 课程结束时间
+				$('#imgShow').append('<li class="newLi"><img src="'+ u + datas.descImage + '" /><p class="newP">删除</p></li>');
+				$('.storesintroduce').append(datas.desc); // 课程内容
+				if(datas.descImage != ""){
+					$(".stores-show-img-upload-div").hide();
+					$('#imgShow').on('click','.newP',function(){
+						$(this).parentsUntil('#imgShow').remove();
+						$(".stores-show-img-upload-div").show();
+					});
+				}
+			});
+		});
+		
+		// 拼接地址函数
+		function jointUrl(imgId,getStoreName,getStoreAdd,getStoreTel,getStoreFacilities,getStoreIntroduce,getWeekIndex){
+			// targetId：目标节点
+			// 上传图片的id
+			// getStoreName：课程名称
+			// getStoreAdd：课程开始时间
+			// getStoreTel：课程结束时间
+			// getStoreFacilities：门店id
+			// getStoreIntroduce：课程简介
+			// getWeekIndex：星期几
+			let imgShowLen = document.getElementById(imgId).childNodes, // 课程图父级li节点
+			subShowImgArr = [], // 创建空数组，存放门店展示图img的src
+			JoinShowSrc = "", // 拼接有效的门店展示图提交路径数据
+			storesshowVal = ""; // 门店展示图路径
+			
+			// 门店名称验证
+			if(getStoreName == "" || getStoreName == undefined || getStoreName == null){
+				alert('请输入门店名称');
+				return;
+			}
+			// 门店地址验证
+			if(getStoreAdd == "" || getStoreAdd == undefined || getStoreAdd == null){
+				alert('请输入门店地址');
+				return;
+			}
+			// 门店电话验证
+			if(getStoreTel == "" || getStoreTel == undefined || getStoreTel == null){
+				alert('请输入门店地址');
+				return;
+			}
+			// 门店设施验证
+			if(getStoreFacilities == "" || getStoreFacilities == undefined || getStoreFacilities == null){
+				alert('请输入门店设施');
+				return;
+			}
+			if(getStoreIntroduce == "" || getStoreIntroduce == undefined || getStoreIntroduce == null){
+				// 门店简介验证
+				alert('请输入门店简介');
+				return;
+			}
+			// 星期几验证
+			if(getWeekIndex == "" || getWeekIndex == undefined || getWeekIndex == null){
+				// 门店简介验证
+				alert('请获取正确的星期');
+				return;
+			}
+			
+			// 获取门店展示图上传接口的路径
+			for(let s=0;s<imgShowLen.length;s++){
+				let subShowImgSrc = "";
+				subShowImgSrc = imgShowLen[s].firstElementChild.src;
+				subShowImgArr.push(subShowImgSrc);
+			}
+			if(imgShowLen.length == 0){
+				alert('门店展示图不能为空');
+				return;
+			}else{
+				for(let a in subShowImgArr){
+					JoinShowSrc += 'api' + subShowImgArr[a].split('api')[1] + '|';
+				}
+			}
+			console.log(JoinShowSrc.substring(0,JoinShowSrc.length-1),'111');
+			$.ajax({
+				// 请求头信息
+				headers:{
+					"Accept": "application/json",
+					"token":JSON.parse(localStorage.getItem("userData")).map.token
+				},
+				// 请求方式
+				type:"POST",
+				// 请求属于同步还是异步
+				async:false,
+				// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+				dataType:'json',
+				url:u + "course/weekPlan/save",
+				contentType : "application/json",
+				data:JSON.stringify({
+					"courseName": getStoreName,
+					"desc": getStoreIntroduce,
+					"descImage": JoinShowSrc.substring(0,JoinShowSrc.length-1),
+					"endTime": getStoreTel,
+					"id": classIdDataNum,
+					"starTime": getStoreAdd,
+					"storeId": getStoreFacilities,
+					"weekIndex": getWeekIndex
+				}),
+				success:function (res) {
+					if(res.code == 200 && res.msg == '保存成功！'){
+						$(window).attr('location','/page/courseManagement/courseManagement.html');
+					}else{
+						alert('新增失败');
+					}
+				},
+				error:function(err) {
+					console.log(err.status,'失败返回');
+				},				
+			});
+		}
+		// 点击提交
+		$('.determine-inp').click(function(){
+			let coursenameVal = $("input[name='coursename']").val(), // 课程名称
+			starttimeVal = $("input[name='starttime']").val(), // 课程开始时间
+			endtimeVal = $("input[name='endtime']").val(), // 课程结束时间
+			// storesshowVal = $("input[name='storesshow']").val(), // 课程图片
+			storesintroduceVal = $("textarea[name='storesintroduce']").val(), // 课程内容
+			storeId = $("input[name='coursename']").attr('storeId'), // 门店id
+			weekIndex = parseInt($("input[name='coursename']").attr('weekIndex')); // 星期几
+		    // 提交表单的时候如果是多张图片就拼接地址
+			jointUrl('imgShow',coursenameVal,starttimeVal,endtimeVal,storeId,storesintroduceVal,weekIndex);
+		});
+		//点击取消
+		$('.cancel-inp').click(function(){
+			$(window).attr('location','/page/courseManagement/courseManagement.html');
+		});
+	}	
+	// 图片上传
+	uploadImg('uploadShow','imgShow',"1");
+	
+	// 时间选择器
+	$("#startTimeId").bind('click',function(event){timePacker($(this),event)}); // input框
+	$("#endTimeId").bind('click',function(event){timePacker($(this),event)}); // input框
+</script>
+</html>

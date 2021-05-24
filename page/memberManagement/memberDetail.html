@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link href="../../css/memberDetail.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/jquery-3.4.1.min.js"></script>
+<title>活动详情</title>
+</head>
+<body>
+	<!-- 抬头标题 -->
+	<div class="add-stores-count">
+		<!-- 顶部位置提示 -->
+		<div class="bj-color-count">
+			<div class="count-top">
+				<p>会员详情</p>
+			</div>
+			<!-- 会员图片 -->
+			<div class="stores-show-img unified-style">
+				<p>会员图像：</p>
+				<div class="stores-img"><img src="../../image/logo.jpg" /></div>
+			</div>
+			<!-- 真实姓名 -->
+			<div class="stores-add unified-style">
+				<p>真实姓名：</p>
+				<input disabled type="text" name="title" disabled class="title storesadd samestyle" value="" />
+			</div>
+			<!-- 昵称 -->
+			<div class="stores-tel unified-style">
+				<p>会员昵称：</p>
+				<input disabled type="text" name="subTitle" disabled class="subTitle storestel samestyle" value="" />
+			</div>
+			<!-- 用户名 -->
+			<div class="stores-tel unified-style">
+				<p>用户名：</p>
+				<input disabled type="text" name="username" disabled class="username storestel samestyle" value="" />
+			</div>
+			<!-- 密码 -->
+			<div class="stores-tel unified-style">
+				<p>密码：</p>
+				<input disabled type="text" name="password" disabled class="password storestel samestyle" value="" />
+			</div>
+			<!--性别 -->
+			<div class="stores-facilities unified-style">
+				<p>会员性别：</p>
+				<input disabled type="text" name="applyBeginTime" disabled class="applyBeginTime storesfacilities samestyle" value="" />
+			</div>
+			<!--手机号 -->
+			<div class="stores-facilities unified-style">
+				<p>会员手机号：</p>
+				<input disabled type="text" name="applyEndTime" disabled class="applyEndTime storesfacilities samestyle" value="" />
+			</div>
+			<!--地址 -->
+			<div class="stores-facilities unified-style">
+				<p>会员地址：</p>
+				<input disabled type="text" name="memberaddress" disabled class="memberaddress storesfacilities samestyle" value="" />
+			</div>
+			<!--邮箱 -->
+			<div class="stores-facilities unified-style">
+				<p>会员邮箱：</p>
+				<input disabled type="text" name="memberemail" disabled class="memberemail storesfacilities samestyle" value="" />
+			</div>
+			<!--会员状态 -->
+			<div class="stores-facilities unified-style">
+				<p>会员状态：</p>
+				<input type="text" name="memberstatus" class="memberstatus storesfacilities samestyle" value="" />
+			</div>
+			<!-- 卡片备注 -->
+			<div class="stores-facilities unified-style">
+				<p>会员备注：</p>
+				<input type="text" name="note" class="note storesfacilities samestyle" value="" />
+			</div>
+			<!-- 注册日期 -->
+			<div class="stores-facilities unified-style">
+				<p>注册日期：</p>
+				<input disabled type="text" name="creatday" class="creatday storesfacilities samestyle" value="" />
+			</div>
+			<!-- 签名 -->
+			<div class="stores-introduce unified-style">
+				<p>会员签名：</p>
+				<textarea disabled type="text" name="content" disabled class="content storesintroduce samestyle" value=""></textarea>
+			</div>
+			<!-- 提交或取消 -->
+			<div class="determine-cancel">
+				<input class="determine-inp" type="text" value="提交" />
+				<input class="cancel-inp" type="text" value="取消" />
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	let storeData = "",
+	u = getUrl(),
+	storeUrl = window.location.href
+	needUrl = storeUrl.split('?')[1], // 声明存放门店名称的变量
+	memberId = needUrl.split('=')[1];
+	storeData = JSON.parse(localStorage.getItem("userData")); // 门店名称
+	console.log(memberId);
+	if(storeData == null || storeData == undefined){
+		$(window).attr('location','/page/login.html');
+	}else{
+		$(document).ready(function() {
+			// 头部信息数据处理
+			// console.log(JSON.parse(localStorage.getItem("userData")),"用户数据");
+			// 设置门店信息
+			let storeData = "",storeImg = "",token = ""; // 声明存放门店名称的变量
+			storeData = JSON.parse(localStorage.getItem("userData")); // 门店名称
+			token = storeData.map.token;
+			if (storeData.map.mystores.length == 1) {
+				$('#out-logo-name').html('旅·普拉提总部');
+			} else{
+				// console.log('有多家门店');
+			}
+			
+			// json格式提交数据 获取团课信息列表数据 
+			$.post(u+'member/get',{id:memberId},function(res){
+				let datas = res.data;
+				$('.stores-img > img').attr('src',u + datas.headpic); // 会员图像
+				$('.title').attr('value',datas.realName); // 真实姓名
+				$('.subTitle').attr('value',datas.nickName); // 用户昵称
+				$('.username').attr('value',datas.userName); // 用户名
+				$('.password').attr('value',datas.password); // 密码
+				if(datas.sex == '0'){
+					$('.applyBeginTime').attr('value','女'); // 性别
+				}else if(datas.sex == '1'){
+					$('.applyBeginTime').attr('value','男'); // 性别
+				}
+				$('.applyEndTime').attr('value',datas.tel); // 手机号
+				$('.memberaddress').attr('value',datas.address); // 地址
+				if(datas.email == ""){
+					$('.memberemail').attr('value','用户暂未上传邮箱'); // 邮箱
+				}else{
+					$('.memberemail').attr('value',datas.email); // 邮箱
+				}
+				$('.memberstatus').attr('value',datas.rank); // 用户状态
+				$('.note').attr('value',datas.cardType); // 卡片备注
+				$('.creatday').attr('value',datas.createDate); // 注册时间
+				if(datas.signature != ""){
+					$('.content').append(datas.signature); // 会员签名
+				}else{
+					$('.content').append('会员暂未上传签名'); // 会员签名
+				}
+				console.log(datas);
+			});
+			
+			// 点击提交触发事件
+			$('.determine-inp').click(function(){
+				let memberImg = $('.stores-img > img').attr('src'), // 会员图像
+				titleVal = $("input[name='title']").val(), // 真是姓名
+				subTitleVal = $("input[name='subTitle']").val(), // 用户昵称
+				usernameVal = $("input[name='username']").val(), // 用户名
+				passwordVal = $("input[name='password']").val(), // 密码
+				applyBeginTimeVal = $("input[name='applyBeginTime']").val(), // 性别
+				applyEndTimeVal = $("input[name='applyEndTime']").val(), // 手机号
+				memberaddressVal = $("input[name='memberaddress']").val(), // 地址
+				memberemailVal = $("input[name='memberemail']").val(), // email
+				memberstatusVal = $("input[name='memberstatus']").val(), // 用户状态
+				noteVal = $("input[name='note']").val(), // 卡片备注
+				creatdayVal = $("input[name='creatday']").val(), // 注册时间
+				contentVal = $("textarea[name='content']").val(), // 会员签名				
+				needMemberImg = memberImg.split('api')[1],
+				incMemberImg = 'api' + needMemberImg; // 处理后的图片地址
+				if(contentVal == '会员暂未上传签名'){
+					contentVal = '';
+				}
+				if(memberemailVal == "用户暂未上传邮箱"){
+					memberemailVal = '';
+				}
+				
+				$.ajax({
+					// 请求头信息
+					headers:{
+						"Accept": "application/json",
+						"token":token
+					},
+					// 请求方式
+				    type:"POST",
+					// 请求属于同步还是异步
+				    async:false,
+					// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+				    dataType:'json',
+				    url:u+"member/save",
+					contentType : "application/json",
+					data:JSON.stringify({
+						"id":memberId,
+						"cardType": noteVal,
+						"rank": memberstatusVal
+					}),
+				    success:function (data) {
+						// console.log(data);
+						if(data.success){
+							alert(data.msg);
+							$(window).attr('location','/page/memberManagement/memberManagement.html');
+						}else{
+							alert('保存失败' + data.msg);
+						}
+						// console.log(data,'返回数据');
+					},
+					error:function(err) {
+						console.log(err.status,'失败返回');
+					},
+				});
+			});
+			
+			// 点击取消按钮
+			$('.cancel-inp').click(function(){
+				$(window).attr('location','/page/memberManagement/memberManagement.html');
+			});
+		})
+	}
+</script>
+</html>

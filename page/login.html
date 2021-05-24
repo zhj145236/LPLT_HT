@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>登陆</title>
+<link href="../css/public.css" rel="stylesheet" type="text/css">
+<link href="../css/login.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="../js/config.js"></script>
+
+</head>
+
+<body>
+	<!-- 旅普拉提login -->
+	<div class="out-log">
+		<div class="logo-img">
+			<img src="../image/logo.jpg">
+		</div>
+		<form id="user-form" class="form-div" method="post">
+			<div class="inp-div"><p class="inp-div-p">用户名：</p><input class="user-inp" name="userName" value="" /></div>
+			<div class="inp-div"><p class="inp-div-p">密码：</p><input class="pws-inp" name="password" value="" /></div>
+			<input class="sum-inp" id="submit" type="button" value="提交" />
+		</form>
+	</div>
+</body>
+<script>
+	
+	$(document).ready(function() {
+		$("#submit").click(function() {
+			window.location.href="./storesManagement/storesManagement.html";
+			return;
+			// let userName = $('.user-inp').val(),password = $('.pws-inp').val(),u = getUrl();
+			// if (userName == '' || userName == undefined) {
+			// 	alert('请正确输入用户名');
+			// }else if(password == '' || password == undefined){
+			// 	alert('请正确输入用户密码');
+			// }else{
+			// 	$.post(u+"user/login", {
+			// 		userName:userName,
+			// 		password:password
+			// 	}, function(data) {
+			// 		if(data.success){
+			// 			localStorage.setItem('userData',JSON.stringify(data));
+			// 			// console.log(JSON.parse(localStorage.getItem("userData")),"用户数据");
+			// 			window.location.href="/page/storesManagement/storesManagement.html";
+			// 		}else{
+			// 			alert(data.msg);
+			// 		}						
+			// 	});					
+			// }				
+		});
+	});
+</script>
+</html>

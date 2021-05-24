@@ -1,0 +1,69 @@
+@charset "utf-8";
+/* CSS Document */
+.bj-img{
+
+}
+body{height: 100%;
+	width: 100%;
+	background-image: url(../image/yj.jpg);
+	background-size:cover;
+	background-repeat:no-repeat;
+}
+
+/*登陆页style，logo*/
+.out-log{
+	width: 50%;
+	margin:80px auto 0 auto;
+}
+.logo-img{
+	width: 160px;
+	height: 160px;
+	border-radius: 100%;
+	overflow: hidden;
+	margin:0 auto 20px auto;
+}
+.logo-img img{
+	width:160px;
+	height: auto;
+}
+/*input style*/
+.user-inp,.pws-inp{
+	width: 86%;
+	outline:none;
+	border:0px;
+	text-indent:15px;
+	height: 40px;
+	line-height: 40px;
+	background-color: rgba(0,0,0,0.3);
+	color: #fff;
+}
+.inp-div{
+	color: #343434;
+	font-size: 14px;
+	margin: 20px auto 0 auto;
+}
+.inp-div-p{
+	width: 14%;
+	text-align: right;
+	float: left;
+	height: 40px;
+	line-height: 40px;
+}
+.form-div{
+	width:60%;	
+	margin: auto;
+	background-color: rgba(255,255,255,0.4);
+	border: 1px solid #c6c6c6;
+	padding: 20px;
+}
+.sum-inp{
+	width: 86%;
+	background-color: #1578ae;
+	color: #fff;
+	outline:none;
+	border:0px;
+	margin: 20px auto 0 57px;
+	height: 40px;
+	line-height: 40px;
+	font-size: 14px;
+}

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>教练管理</title>
+<link href="../../css/public.css" rel="stylesheet" type="text/css">
+<link href="../../css/template.css" rel="stylesheet" type="text/css">
+<link href="../../css/coachManagement.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../../js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+</head>
+<body>
+	<!-- 教练管理 -->
+	<header>
+		<!-- logo展示 -->
+		<div class="out-logo">
+			<div class="out-logo-img">
+				<div class="logo-img">
+					<img src="../../image/logo.jpg">
+				</div>
+				<p id="out-logo-name"></p>
+			</div>
+			<ul class="header-ul">
+				<li>退出</li>
+			</ul>
+		</div>
+	</header>
+	<!-- 左边菜单栏 -->
+	<ul class="left-menu-ul">
+		<li class="left-menu">
+			<nav>
+				<a href="../storesManagement/storesManagement.html" onclick="selectMenu(this)">门店管理</a>
+				<a href="../courseManagement/courseManagement.html" onclick="selectMenu(this)">周计划模板</a>
+				<a class="curCls" href="../coachManagement/coachManagement.html" onclick="selectMenu(this)">教练管理</a>
+				<a href="../groupClassManagement/groupClassManagement.html" onclick="selectMenu(this)">团课管理</a>
+				<a href="../personalTrainingManagement/personalTrainingManagement.html" onclick="selectMenu(this)">私课管理</a>
+				<a href="../activityCenter/activityCenter.html" onclick="selectMenu(this)">活动中心</a>
+				<a href="../memberManagement/memberManagement.html" onclick="selectMenu(this)">手机注册</a>
+				<a href="../storesMember/storesMember.html" onclick="selectMenu(this)">会员记录</a>
+			</nav>		
+		</li>
+		<li class="right-content">
+			<div class="center-content">
+				<!-- 新增按钮 -->
+				<div class="add-stores">
+					<button class="add-stores-btn new-coach"></button>
+					<div class="chosestores-out">
+						<select name="chosestores" class="chosestores"></select>
+					</div>					
+					<button class="add-stores-btn determine">确认门店</button>
+				</div>
+				<!-- 门店列表 -->
+				<ul class="stores-list">
+					<div class="hiden-data">暂无教练，请添前往新增教练进行添加。</div>
+					<div class="show-data"></div>
+				</ul>
+			</div>
+		</li>
+	</ul>
+</body>
+<script type="text/javascript">
+	function selectMenu(obj) {
+	    var eles = document.getElementsByTagName("a");
+	    for (let i = 0; i < eles.length; i++) {
+	        let e = eles[i];
+	        let clsAttr = e.getAttribute["group"];
+	        if (clsAttr = "") {
+	            e.setAttribute("class", "");
+	        }
+	        obj.setAttribute("class","curCls");
+	    }
+	}
+	
+	$(document).ready(function() {
+		// 设置门店信息
+		let storeData = "",
+		storeImg = "",
+		starId = "",
+		chosestoresData,
+		u = getUrl();
+		storeData = JSON.parse(localStorage.getItem("userData")); // 门店名称
+		if(storeData == null || storeData == undefined){
+			// $(window).attr('location','/page/login.html');
+		}else{
+			let storesDows = storeData.map.mystores,
+			storeIdData = storeData.map.user.store_id,
+			storeName = "",
+			storesList="";
+			// 设置门店信息
+			if (storeIdData == -1) {
+				$('#out-logo-name').html('旅·普拉提总部');
+				$('.new-coach').html('查看门店教练');
+			} else{
+				$('.new-coach').html('新增教练');
+				$(".determine").css("display","none");
+				for(let j=0;j<storesDows.length;j++){
+					$('#out-logo-name').html('旅·普拉提-' + storesDows[j].name);
+					storeName = "旅·普拉提-" + storesDows[j].name;
+				}
+			}
+			// 门店数据渲染
+			for(let i=0;i<storesDows.length;i++){
+				storesList+='<option value="' + storesDows[i].id + '">' + storesDows[i].name + '</option>';
+				starId = storesDows[0].id;
+				$('.chosestores').html(storesList);
+			}
+			
+			// 通过选择门店加载对应门店数据
+			function getClassTemplate(getId,showTarget,hideTarget,joinCoach){
+				$.ajax({
+					// 请求头信息
+					headers:{
+						"Accept": "application/json",
+						"token":storeData.map.token
+					},
+					// 请求方式
+					type:"POST",
+					// 请求属于同步还是异步
+					async:false,
+					// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+					dataType:'json',
+					url:u+"memeber/coach/list",
+					contentType : "application/json",
+					data:JSON.stringify({
+						"store_id":getId
+					}),
+					success:function (res) {
+						let effectiveData = res.page.rows;
+						console.log(effectiveData);
+						if(effectiveData == null){
+							$(hideTarget).css("display","block");
+							$(showTarget).css("display","none");
+						}else{
+							$(showTarget).css("display","block");
+							$(hideTarget).css("display","none");
+							for(let s in effectiveData){
+								joinCoach+='<li class="stores-list-li">';
+								joinCoach+='<div class="stores-list-li-left">';
+								joinCoach+='<div class="stores-img"><img src="'+ u + effectiveData[s].headpic+'" /></div>';
+								joinCoach+='<p class="stores-name change-style">' + effectiveData[s].name + '</p>';
+								joinCoach+='<p class="stores-time change-style">主教课程：' + effectiveData[s].skill + '</p>';
+								joinCoach+='</div>';
+								joinCoach+='<div class="stores-list-li-right">';
+								joinCoach+='<button class="stores-clear" coachId="' + effectiveData[s].id + '">删除</button>';
+								joinCoach+='<button class="stores-detailed" coachId="' + effectiveData[s].id + '">详情</button>';
+								joinCoach+='</div>';
+								joinCoach+='</li>';
+								$(showTarget).html(joinCoach);
+							}
+						}
+					},
+					error:function(err) {
+						console.log(err.status,'失败返回');
+					},
+				});
+			}
+			
+			// 设置门店信息
+			if (storeIdData == -1) {
+				$('.show-data .stores-clear').css('display','none');
+			}
+			
+			$('.chosestores').on("change", function(){
+				let changeGetData = this.value;
+				chosestoresData = changeGetData;
+			});
+			if(chosestoresData == undefined || chosestoresData == ""){
+				let getDatas = "";
+				getClassTemplate(starId,'.show-data','.hiden-data',getDatas);
+			}
+			$(".determine").on("click",function(){
+				let getData = "";
+				getClassTemplate(chosestoresData,'.show-data','.hiden-data',getData);
+			});
+			
+			// 点击新增按钮实现新增功能
+			if(storeIdData != -1){
+				$('.new-coach').click(function(){
+					$(window).attr('location','/page/coachManagement/addCoach.html?storeId=' + starId);
+				});
+			}
+			// 点击删除，执行删除功能
+			$('.show-data').on('click','.stores-clear',function(){
+				let coachId = $(this).attr("coachId");
+				$.post(u+"memeber/coach/delete ", {id:coachId}, function(data) {
+					if(data.code == 200 && data.msg == '删除成功！'){
+						getClassTemplate(starId);
+						window.location.reload();
+					}
+				});	
+			});
+			
+			// 点击详情进入详情界面
+			$('.show-data').on('click','.stores-detailed',function(){
+				let coachId = $(this).attr("coachId");
+				$(window).attr('location','/page/coachManagement/coachDetails.html?storeId=' + starId + '&id=' + coachId);
+			});
+		}
+	});
+</script>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>门店会员</title>
+<link href="../../css/public.css" rel="stylesheet" type="text/css">
+<link href="../../css/template.css" rel="stylesheet" type="text/css">
+<link href="../../css/storesMember.css" rel="stylesheet" type="text/css">
+<link href="../../css/storeMemberAlert.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../../js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/storeMemberAlert.js"></script>
+</head>
+<body>
+	<!-- 门店管理 -->
+	<header>
+		<!-- logo展示 -->
+		<div class="out-logo">
+			<div class="out-logo-img">
+				<div class="logo-img">
+					<img src="../../image/logo.jpg">
+				</div>
+				<p id="out-logo-name"></p>
+			</div>
+			<ul class="header-ul">
+				<li>退出</li>
+			</ul>
+		</div>
+	</header>
+	<!-- 左边菜单栏 -->
+	<ul class="left-menu-ul">
+		<li class="left-menu">
+			<nav>
+				<a href="../storesManagement/storesManagement.html" onclick="selectMenu(this)">门店管理</a>
+				<a href="../courseManagement/courseManagement.html" onclick="selectMenu(this)">周计划模板</a>
+				<a href="../coachManagement/coachManagement.html" onclick="selectMenu(this)">教练管理</a>
+				<a href="../groupClassManagement/groupClassManagement.html" onclick="selectMenu(this)">团课管理</a>
+				<a href="../personalTrainingManagement/personalTrainingManagement.html" onclick="selectMenu(this)">私课管理</a>
+				<a href="../activityCenter/activityCenter.html" onclick="selectMenu(this)">活动中心</a>
+				<a href="../memberManagement/memberManagement.html" onclick="selectMenu(this)">手机注册</a>
+				<a class="curCls" href="../storesMember/storesMember.html" onclick="selectMenu(this)">会员记录</a>
+			</nav>
+		</li>
+		<li class="right-content">
+			<div class="center-content">
+				<!-- 新增按钮 -->
+				<div class="add-stores">
+					<button class="add-stores-btn">新增会员</button>
+				</div>
+				<!-- 会员管理 -->
+				<ul class="stores-list">
+					<div class="hiden-data">暂未添加任何数据</div>
+					<div class="show-data"></div>
+				</ul>
+			</div>
+		</li>
+	</ul>
+</body>
+<script type="text/javascript">
+	function selectMenu(obj) {
+	    var eles = document.getElementsByTagName("a");
+	    for (let i = 0; i < eles.length; i++) {
+	        let e = eles[i];
+	        let clsAttr = e.getAttribute["group"];
+	        if (clsAttr = "") {
+	            e.setAttribute("class", "");
+	        }
+	        obj.setAttribute("class","curCls");
+	    }
+	}
+	let storeData = "",u = getUrl(); // 声明存放门店名称的变量
+	storeData = JSON.parse(localStorage.getItem("userData")); // 门店名称
+	if(storeData == null || storeData == undefined){
+		$(window).attr('location','/page/login.html');
+	}else{
+		$(document).ready(function() {
+			// 头部信息数据处理
+			// console.log(JSON.parse(localStorage.getItem("userData")),"用户数据");
+			// 设置门店信息
+			let storeData = "",storeImg = "",token = ""; // 声明存放门店名称的变量
+			storeData = JSON.parse(localStorage.getItem("userData")); // 门店名称
+			token = storeData.map.token,createTarget="";
+			if (storeData.map.mystores.length == 1) {
+				$('#out-logo-name').html('旅·普拉提总部');
+			} else{
+				// console.log('有多家门店');
+			}
+			
+			// json格式提交数据 获取团课信息列表数据 
+			function getMemberData(url,memberToken,operTarget,createTarget,receiveTarget){
+				/** 
+				 * url 调取的接口
+				 * memberToken 会员唯一识别码
+				 * operTarget 操作显示跟隐藏的节点
+				 * createTarget 用于拼接数据的容器
+				 * receiveTarget 将拼接的数据载入的父级节点
+				**/
+				$.ajax({
+					// 请求头信息
+					headers:{
+						"Accept": "application/json",
+						"token":memberToken
+					},
+					// 请求方式
+				    type:"POST",
+					// 请求属于同步还是异步
+				    async:false,
+					// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+				    dataType:'json',
+				    url:u+url,
+					contentType : "application/json",
+					data:JSON.stringify({}),
+				    success:function (data) {
+						let membersData = data.page.rows;
+						// console.log(membersData);
+						if(membersData == null){
+							$(operTarget).css('display','block');
+						}else{
+							$(operTarget).css('display','none');
+						}
+						if(membersData != ""){
+							for(let i in membersData){
+								createTarget+='<li class="stores-list-li">';
+								createTarget+='<div class="stores-list-li-left">';
+								createTarget+='<p class="stores-name change-style">真实姓名:'+ membersData[i].realName +'</p>';
+								createTarget+='<p class="stores-time change-style">会员状态:'+ membersData[i].rank +'</p>';
+								createTarget+='<p class="stores-time change-style">手机号:'+ membersData[i].tel +'</p>';
+								if(membersData[i].cardType == ""){
+									createTarget+='<p class="stores-time change-style">备注:暂无备注信息</p></div>';
+								}else{
+									createTarget+='<p class="stores-time change-style">备注:'+ membersData[i].cardType +'</p></div>';
+								}
+								createTarget+='<div class="stores-list-li-right">';
+								createTarget+='<button class="stores-clear" data-id="'+ membersData[i].id +'">删除</button>';
+								createTarget+='<button class="stores-detailed" data-id="'+ membersData[i].id +'">详情</button></div></li>';
+								$(receiveTarget).html(createTarget);
+								// console.log(membersData[i]);
+							}
+						}
+						
+						// console.log(membersData,'返回数据');
+					},
+					error:function(err) {
+						console.log(err.status,'失败返回');
+					},
+				});
+			}
+			
+			
+			getMemberData('member/getStoreMemeberList',token,'.hiden-data',createTarget,'.show-data');
+			
+			$('.add-stores-btn').click(function(){
+				let createData = "";
+				createData+='<ul>';
+				createData+='<li class="join-data">';
+				createData+='<span>真实姓名：</span>';
+				createData+='<input class="realName" name="realName" value="" placeholder="例如：张三" />';
+				createData+='</li>';
+				createData+='<li class="join-data">';
+				createData+='<span>会员状态：</span>';
+				createData+='<input class="rank" name="rank" value="" placeholder="普通会员/VIP会员" />';
+				createData+='</li>';
+				createData+='<li class="join-data">';
+				createData+='<span>会员备注：</span>';
+				createData+='<input class="cardType" name="cardType" value="" placeholder="例如：月卡(缴费3000RMB)"  />';
+				createData+='</li>';
+				createData+='<li class="join-data">';
+				createData+='<span>缴费情况：</span>';
+				createData+='<input class="cardType" name="cardType" value="" placeholder="例如：月卡(缴费3000RMB)" />';
+				createData+='</li>'
+				createData+='<li class="join-data">';
+				createData+='<span>会员性别：</span>';
+				createData+='<input class="sex" name="sex" value="" placeholder="男/女"  />';
+				createData+='</li>';
+				createData+='<li class="join-data">';
+				createData+='<span>手机号：</span>';
+				createData+='<input class="tel" name="tel" value="" placeholder="请填写手机号"  />';
+				createData+='</li>';
+				createData+='</ul>';
+				let txt=  createData,
+				option = {
+					title: "新增会员",
+					btn: parseInt("0011",2),
+					onOk: function(){
+						let realNameVal = $("input[name='realName']").val(), // 真实姓名
+						rankVal = $("input[name='rank']").val(), // 会员状态
+						cardTypeVal = $("input[name='cardType']").val(), // 会员状态
+						sexVal = $("input[name='sex']").val(), // 会员性别
+						telVal = $("input[name='tel']").val(); // 会员手机号
+						if(sexVal == "女"){
+							sexVal = '0';
+						}else if(sexVal == '男'){
+							sexVal = '1';
+						}
+						if(realNameVal == ""){
+							alert('真实姓名不能为空');
+							return;
+						}else if(sexVal == ""){
+							alert('会员性别不能为空');
+							return;
+						}else if(telVal == ""){
+							alert('会员手机号不能为空');
+							return;
+						}else{
+							// json格式提交数据 获取团课信息列表数据
+							$.ajax({
+								// 请求头信息
+								headers:{
+									"Accept": "application/json",
+									"token":token
+								},
+								// 请求方式
+							    type:"POST",
+								// 请求属于同步还是异步
+							    async:false,
+								// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+							    dataType:'json',
+							    url:u+"member/saveStoreMember",
+								contentType : "application/json",
+								data:JSON.stringify({
+									"cardType": cardTypeVal,  // 会员卡类型： 周卡; 月卡; 年卡
+									"rank": rankVal, //会员状态： 普通会员; VIP会员
+									"realName": realNameVal, //会员真实姓名
+									"sex": sexVal,  //性别 0=女; 1=男
+									// "storeId": "2",  //会员所关联的门店ID
+									"tel": telVal,  //会员手机号
+								}),
+							    success:function (data) {
+									createTarget = "";
+									alert('新增成功');
+									getMemberData('member/getStoreMemeberList',token,'.hiden-data',createTarget,'.show-data');
+									window.location.reload();
+								},
+								error:function(err) {
+									console.log(err.status,'失败返回');
+								},
+							});
+						}
+					}
+				}
+				window.wxc.xcConfirm(txt, "custom", option);
+			});
+			
+			// 点击详情
+			$('.show-data').on('click','.stores-detailed',function(){
+				let id = $(this).attr("data-id");
+				// console.log(id);
+				// 获取单条会员信息
+				$.post(u+'member/get',{id:id},function(res){
+					let datas = res.data;
+					console.log(res);
+					if(res.success){
+						let createData = "";
+						createData+='<ul>';
+						createData+='<li class="join-data">';
+						createData+='<span>真实姓名：</span>';
+						createData+='<input class="realName" name="realName" value="'+datas.realName+'" placeholder="例如：张三" />';
+						createData+='</li>';
+						createData+='<li class="join-data">';
+						createData+='<span>会员状态：</span>';
+						createData+='<input class="rank" name="rank" value="'+datas.rank+'" placeholder="普通会员/VIP会员" />';
+						createData+='</li>';
+						createData+='<li class="join-data">';
+						createData+='<span>会员备注：</span>';
+						createData+='<input class="cardType" name="cardType" value="'+datas.cardType+'" placeholder="例如：月卡(缴费3000RMB)"  />';
+						createData+='</li>';
+						createData+='<li class="join-data">';
+						createData+='<span>会员性别：</span>';
+						if(datas.sex == "0"){
+							createData+='<input class="sex" name="sex" value="女" placeholder="男/女"  />';	
+						}else if(datas.sex == "1"){
+							createData+='<input class="sex" name="sex" value="男" placeholder="男/女"  />';
+						}
+						createData+='</li>';
+						createData+='<li class="join-data">';
+						createData+='<span>手机号：</span>';
+						createData+='<input class="tel" name="tel" value="'+datas.tel+'" placeholder="请填写手机号"  />';
+						createData+='</li>';
+						createData+='<li class="join-data">';
+						createData+='<span>创建日期：</span>';
+						createData+='<input disabled class="createDate" name="createDate" value="'+datas.createDate+'"  />';
+						createData+='</li>';
+						createData+='</ul>';
+						let txt=  createData,
+						option = {
+							title: "修改会员",
+							btn: parseInt("0011",2),
+							onOk: function(){
+								let realNameVal = $("input[name='realName']").val(), // 真实姓名
+								rankVal = $("input[name='rank']").val(), // 会员状态
+								cardTypeVal = $("input[name='cardType']").val(), // 会员状态
+								sexVal = $("input[name='sex']").val(), // 会员性别
+								telVal = $("input[name='tel']").val(); // 会员手机号
+								if(sexVal == "女"){
+									sexVal = '0';
+								}else if(sexVal == '男'){
+									sexVal = '1';
+								}
+								if(realNameVal == ""){
+									alert('真实姓名不能为空');
+									return;
+								}else if(sexVal == ""){
+									alert('会员性别不能为空');
+									return;
+								}else if(telVal == ""){
+									alert('会员手机号不能为空');
+									return;
+								}else{
+									// json格式提交数据 获取团课信息列表数据
+									$.ajax({
+										// 请求头信息
+										headers:{
+											"Accept": "application/json",
+											"token":token
+										},
+										// 请求方式
+									    type:"POST",
+										// 请求属于同步还是异步
+									    async:false,
+										// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+									    dataType:'json',
+									    url:u+"member/saveStoreMember",
+										contentType : "application/json",
+										data:JSON.stringify({
+											'id':id,
+											"cardType": cardTypeVal,  // 会员卡类型： 周卡; 月卡; 年卡
+											"rank": rankVal, //会员状态： 普通会员; VIP会员
+											"realName": realNameVal, //会员真实姓名
+											"sex": sexVal,  //性别 0=女; 1=男
+											// "storeId": "2",  //会员所关联的门店ID
+											"tel": telVal,  //会员手机号
+										}),
+									    success:function (data) {
+											createTarget = "";
+											alert('数据修改成功');
+											getMemberData('member/getStoreMemeberList',token,'.hiden-data',createTarget,'.show-data');
+											window.location.reload();
+										},
+										error:function(err) {
+											console.log(err.status,'失败返回');
+										},
+									});
+								}
+							}
+						}
+						window.wxc.xcConfirm(txt, "custom", option);
+					}
+				});
+			});
+			
+			// 点击删除按钮
+			$('.show-data').on('click','.stores-clear',function(){
+				let id = $(this).attr("data-id");
+				console.log(typeof id);
+				$.ajax({
+					// 请求头信息
+					headers:{
+						"Accept": "application/json",
+						"token":token
+					},
+					// 请求方式
+				    type:"POST",
+					// 请求属于同步还是异步
+				    async:false,
+					// 预期服务器返回的数据类型，如果不指定，jQuery会根据响应包自动判断，一般我们直接设定为json
+				    dataType:'json',
+				    url:u+"member/delete",
+					contentType : "application/x-www-form-urlencoded",
+					data:{'id':id},
+				    success:function (data) {
+						console.log(data);
+						createTarget = "";
+						alert('数据删除成功');
+						getMemberData('member/getStoreMemeberList',token,'.hiden-data',createTarget,'.show-data');
+						window.location.reload();
+					},
+					error:function(err) {
+						console.log(err.status,'失败返回');
+					},
+				});
+			});
+		})
+	}
+</script>
+</html>
